@@ -2,6 +2,16 @@ using CRM_Granat.Models;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using BCrypt.Net;
+using CRM_Granat.Data;
+using CRM_Granat.DTOs;
+
+
 
 namespace CRM_Granat.Controllers
 {

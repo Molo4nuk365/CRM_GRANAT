@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CRM_Granat")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+579c332cbd34d98bb20e5ba903b6a3e4dcae0782")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+149f757947c5d0a553c5e03d34d3972767f4e857")]
 [assembly: System.Reflection.AssemblyProductAttribute("CRM_Granat")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CRM_Granat")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

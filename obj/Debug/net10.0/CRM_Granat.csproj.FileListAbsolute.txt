@@ -6,3 +6,4 @@ D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.csproj.CoreCompileInputs.c
 D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.MvcApplicationPartsAssemblyInfo.cache
 D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.csproj.AssemblyReference.cache
 D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.MvcApplicationPartsAssemblyInfo.cs
+D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.sourcelink.json

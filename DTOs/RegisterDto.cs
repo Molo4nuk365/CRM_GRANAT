@@ -1,8 +1,13 @@
-﻿using System;
+﻿
+namespace CRM_Granat.DTOs;
 
-public class Class1
+public class RegisterDto
 {
-	public Class1()
-	{
-	}
+    public string Login { get; set; }
+    public string Password { get; set; }
+    public string FullName { get; set; }
+    public string Phone { get; set; }
+    public string Address { get; set; }
+    public string? Role { get; set; }
 }
+

@@ -1,8 +1,13 @@
-﻿using System;
+﻿namespace CRM_Granat.DTOs;
 
-public class Class1
+public class CartItemDto
 {
-	public Class1()
-	{
-	}
+    public string Type { get; set; }
+    public int Id { get; set; }
+    public int Quantity { get; set; }
+}
+
+public class CreateOrderDto
+{
+    public List<CartItemDto> Items { get; set; }
 }

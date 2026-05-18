@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace CRM_Granat.DTOs;
 
-public class Class1
+public class UpdateStatusDto
 {
-	public Class1()
-	{
-	}
+    public string Status { get; set; }
 }
