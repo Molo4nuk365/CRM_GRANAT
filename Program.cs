@@ -22,7 +22,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Настройка JWT аутентификации
 var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new Exception("Jwt:Key не найден в настройках appsettings.json");
+}
 var key = Encoding.ASCII.GetBytes(jwtKey);
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

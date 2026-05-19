@@ -1,4 +1,5 @@
-﻿namespace CRM_Granat.Models
+﻿#nullable disable
+namespace CRM_Granat.Models
 {
     public class Material
     {

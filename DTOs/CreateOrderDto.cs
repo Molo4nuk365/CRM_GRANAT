@@ -1,4 +1,4 @@
-﻿
+﻿#nullable disable
 namespace CRM_Granat.DTOs;
 
 public class CartItemDto

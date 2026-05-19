@@ -1,5 +1,5 @@
-﻿
-namespace  CRM_Granat.DTOs;
+﻿#nullable disable
+namespace CRM_Granat.DTOs;
 
 public class LoginDto
 {

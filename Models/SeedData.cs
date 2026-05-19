@@ -1,4 +1,4 @@
-﻿
+﻿#nullable disable
 using BCrypt.Net;
 using CRM_Granat.Data;
 namespace CRM_Granat.Models
