@@ -30,14 +30,15 @@ public class UsersController : ControllerBase
     {
         if (await _context.Users.AnyAsync(u => u.Login == dto.Login))
             return BadRequest("Логин занят");
-        var user = new User
+
+        var user = new User 
         {
             Login = dto.Login,
             PasswordHash = BCrypt.HashPassword(dto.Password),
             Role = dto.Role ?? "client",
             FullName = dto.FullName,
             Phone = dto.Phone,
-            Address = dto.Address
+            Address = dto.Address,
         };
         _context.Users.Add(user);
         await _context.SaveChangesAsync();

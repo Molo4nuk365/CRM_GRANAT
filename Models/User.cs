@@ -1,6 +1,6 @@
 #nullable disable
 namespace CRM_Granat.Models;
-public class Users
+public class User
 {
     public int Id { get; set; }
     public string Login { get; set; }
