@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CRM_Granat.Models;
+using CRM_Granat.DTOs;
 
 namespace CRM_Granat.Data;
 
