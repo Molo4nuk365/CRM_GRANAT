@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
         var user = new User
         {
             Login = dto.Login,
-            PasswordHash = BCrypt.HashPassword(dto.Password),  
+            PasswordHash = BCrypt.HashPassword(dto.Password),
             Role = "client",
             FullName = dto.FullName,
             Phone = dto.Phone,

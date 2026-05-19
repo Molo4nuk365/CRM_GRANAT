@@ -31,7 +31,7 @@ public class UsersController : ControllerBase
         if (await _context.Users.AnyAsync(u => u.Login == dto.Login))
             return BadRequest("Логин занят");
 
-        var user = new User 
+        var user = new User
         {
             Login = dto.Login,
             PasswordHash = BCrypt.HashPassword(dto.Password),
