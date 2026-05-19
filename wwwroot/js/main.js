@@ -1,34 +1,47 @@
+
+// ПОЛНАЯ ЛОГИКА CRM: авторизация, корзина, заказы, ремонт,
+// роли (admin, manager, jeweler, client), управление материалами,
+// история продаж, тёмная/светлая тема.
+// ============================================================
+
+// ========== 1. ДАННЫЕ  ==========
 let products = [
-    { id: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, desc: "Серебро 925, натуральный гранат 0.8 карат", material: "Серебро 925, гранат", weight: "3.2 г", article: "GR-101", image: "images/кольцо.png" },
-    { id: 2, name: "Серьги «Лунный свет»", price: 12400, desc: "Серебро 925, гранат 0.5 карат в каждой серьге", material: "Серебро 925, гранат", weight: "4.5 г", article: "GR-102", image: "images/серьги.png" },
-    { id: 3, name: "Подвеска «Капля росы»", price: 9800, desc: "Серебро 925, гранат 2 карат, цепочка в подарок", material: "Серебро 925, гранат", weight: "1.8 г", article: "GR-103", image: "images/подвеска.jpg" },
-    { id: 4, name: "Браслет «Серебряная нить»", price: 23500, desc: "Серебро 925 с родированием, вставки граната", material: "Серебро 925, гранат", weight: "6.2 г", article: "GR-104", image: "images/браслет.png" },
-    { id: 5, name: "Брошь «Гранат»", price: 15900, desc: "Серебро 925, крупный гранат 2 карат", material: "Серебро 925, гранат", weight: "5.1 г", article: "GR-105", image: "images/брошь.jpg" }
+    { id: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, desc: "Серебро 925, гранат 0.8 карат", material: "Серебро 925, гранат", weight: "3.2 г", article: "GR-101", image: "images/кольцо.png" },
+    { id: 2, name: "Серьги «Лунный свет»", price: 12400, desc: "Серебро 925, гранат 0.5 карат", material: "Серебро 925, гранат", weight: "4.5 г", article: "GR-102", image: "images/серьги.png" },
+    { id: 3, name: "Подвеска «Капля росы»", price: 9800, desc: "Серебро 925, гранат 1 карат", material: "Серебро 925, гранат", weight: "1.8 г", article: "GR-103", image: "images/подвеска.jpg" },
+    { id: 4, name: "Браслет «Золотая нить»", price: 23500, desc: "Серебро 925, гранат", material: "Серебро 925, гранат", weight: "6.2 г", article: "GR-104", image: "images/браслет.jpg" },
+    { id: 5, name: "Брошь «Гранат»", price: 15900, desc: "Серебро 925, гранат 2 карат", material: "Серебро 925, гранат", weight: "5.1 г", article: "GR-105", image: "images/брошь.jpg" }
 ];
+
 let repairOptions = [
     { id: 101, name: "Ремонт кольца", price: 3500, desc: "Пайка, полировка, изменение размера" },
     { id: 102, name: "Ремонт серёг", price: 2800, desc: "Замена замка, полировка" },
     { id: 103, name: "Ремонт цепочки", price: 2200, desc: "Пайка звеньев, замена замка" },
     { id: 104, name: "Чистка и полировка", price: 1200, desc: "Ультразвуковая чистка, полировка" }
 ];
+
 let users = [
     { id: 1, login: 'admin', password: 'admin123', role: 'admin', fullName: 'Администратор', phone: '', address: '' },
     { id: 2, login: 'manager', password: 'manager123', role: 'manager', fullName: 'Анна Иванова', phone: '', address: '' },
     { id: 3, login: 'jeweler', password: 'jeweler123', role: 'jeweler', fullName: 'Сергей Петров', phone: '', address: '' },
-    { id: 4, login: 'client', password: 'client123', role: 'client', fullName: 'Клиент Тестов', phone: '+7 (999) 123-4567', address: 'г. Москва, ул. Тестовая, д.1' }
+    { id: 4, login: 'client', password: 'client123', role: 'client', fullName: 'Клиент Тестов', phone: '+7 (999) 123-4567', address: 'Москва' }
 ];
+
 let materials = [
     { id: 1, name: 'Серебро 925', quantity: 980, unit: 'г', pricePerUnit: 80 },
-    { id: 2, name: 'Гранат натуральный', quantity: 150, unit: 'кар', pricePerUnit: 1200 }
+    { id: 2, name: 'Гранат', quantity: 150, unit: 'кар', pricePerUnit: 1200 }
 ];
+
 let orders = [
-    { id: 1, clientId: 4, clientName: 'Клиент Тестов', type: 'product', productId: 1, repairId: null, status: 'completed', managerId: 2, jewelerId: 3, deadline: '2026-05-20', total: 18500, completedDate: '2026-05-18', paymentStatus: 'paid' },
-    { id: 2, clientId: 4, clientName: 'Клиент Тестов', type: 'product', productId: 2, repairId: null, status: 'completed', managerId: 2, jewelerId: 3, deadline: '2026-05-25', total: 12400, completedDate: '2026-05-22', paymentStatus: 'paid' },
-    { id: 3, clientId: 4, clientName: 'Клиент Тестов', type: 'repair', productId: null, repairId: 101, status: 'in_progress', managerId: 2, jewelerId: 3, deadline: '2026-06-01', total: 3500, completedDate: null, paymentStatus: 'pending' }
+    { id: 1, clientId: 4, clientName: 'Клиент Тестов', type: 'product', productId: 1, status: 'completed', managerId: 2, jewelerId: 3, deadline: '2026-05-20', total: 18500, completedDate: '2026-05-18', paymentStatus: 'paid' },
+    { id: 2, clientId: 4, clientName: 'Клиент Тестов', type: 'product', productId: 2, status: 'completed', managerId: 2, jewelerId: 3, deadline: '2026-05-25', total: 12400, completedDate: '2026-05-22', paymentStatus: 'paid' },
+    { id: 3, clientId: 4, clientName: 'Клиент Тестов', type: 'repair', repairId: 101, status: 'in_progress', managerId: 2, jewelerId: 3, deadline: '2026-06-01', total: 3500, completedDate: null, paymentStatus: 'pending' }
 ];
+
 let currentUser = null;
 let cart = [];
 
+// ========== 2. ЗАГРУЗКА / СОХРАНЕНИЕ В LOCALSTORAGE ==========
 function loadData() {
     const u = localStorage.getItem('granat_users');
     const m = localStorage.getItem('granat_materials');
@@ -45,6 +58,7 @@ function saveData() {
 loadData();
 function persist() { saveData(); renderApp(); }
 
+// ========== 3. ТЕМА (СВЕТЛАЯ / ТЁМНАЯ) ==========
 const themeToggle = document.getElementById('themeToggle');
 if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
 themeToggle.addEventListener('click', () => {
@@ -60,6 +74,24 @@ function showToast(msg, isError = false) {
     setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
+// ========== 4. КАРУСЕЛЬ ТОВАРОВ ==========
+function renderCarousel() {
+    const carouselInner = document.getElementById('carouselInner');
+    if (!carouselInner) return;
+    carouselInner.innerHTML = products.map((p, idx) => `
+        <div class="carousel-item ${idx === 0 ? 'active' : ''}">
+            <img src="${p.image}" class="d-block w-100 carousel-img" alt="${p.name}" onerror="this.src='https://placehold.co/600x400?text=${p.name}'">
+            <div class="carousel-caption d-none d-md-block">
+                <h5>${p.name}</h5>
+                <p>${p.price.toLocaleString()} ₽</p>
+                <button class="btn btn-sm btn-primary" onclick="quickAddToCart(${p.id})">В корзину</button>
+            </div>
+        </div>
+    `).join('');
+}
+window.quickAddToCart = function (productId) { addToCart(productId); };
+
+// ========== 5. КОРЗИНА ==========
 function addToCart(productId) {
     if (!currentUser || currentUser.role !== 'client') { showToast('Войдите как клиент', true); showAuthModal(); return; }
     const existing = cart.find(item => item.type === 'product' && item.productId === productId);
@@ -73,10 +105,10 @@ function addRepairToCart(repairId) {
         cart.push({ type: 'repair', repairId, quantity: 1, productId: null });
     saveCart(); updateCartBadge(); showToast('Услуга ремонта добавлена');
 }
-function removeFromCart(index) { cart.splice(index,1); saveCart(); updateCartBadge(); if(document.getElementById('cartModal').classList.contains('show')) renderCartModal(); showToast('Удалено'); }
+function removeFromCart(index) { cart.splice(index, 1); saveCart(); updateCartBadge(); if (document.getElementById('cartModal').classList.contains('show')) renderCartModal(); showToast('Удалено'); }
 function saveCart() { localStorage.setItem('granat_cart', JSON.stringify(cart)); }
-function loadCart() { const saved = localStorage.getItem('granat_cart'); if(saved) cart = JSON.parse(saved); else cart = []; }
-function updateCartBadge() { const count = cart.reduce((s,i)=> s + (i.quantity||1),0); document.getElementById('cartCount').innerText = count; }
+function loadCart() { const saved = localStorage.getItem('granat_cart'); if (saved) cart = JSON.parse(saved); else cart = []; }
+function updateCartBadge() { const count = cart.reduce((s, i) => s + (i.quantity || 1), 0); document.getElementById('cartCount').innerText = count; }
 function renderCartModal() {
     const modalBody = document.getElementById('cartModalBody');
     if (!modalBody) return;
@@ -86,15 +118,15 @@ function renderCartModal() {
     cart.forEach((item, idx) => {
         let name, price;
         if (item.type === 'product') {
-            const prod = products.find(p=>p.id===item.productId);
-            if(!prod) return;
+            const prod = products.find(p => p.id === item.productId);
+            if (!prod) return;
             name = prod.name;
             price = prod.price;
-            total += price * (item.quantity||1);
-            itemsHtml += `<div class="list-group-item d-flex justify-content-between align-items-center">${name} x ${item.quantity||1} = ${(price*(item.quantity||1)).toLocaleString()}₽ <button class="btn-sm btn-outline-danger" onclick="removeFromCart(${idx})">Удалить</button></div>`;
+            total += price * (item.quantity || 1);
+            itemsHtml += `<div class="list-group-item d-flex justify-content-between align-items-center">${name} x ${item.quantity || 1} = ${(price * (item.quantity || 1)).toLocaleString()}₽ <button class="btn-sm btn-outline-danger" onclick="removeFromCart(${idx})">Удалить</button></div>`;
         } else {
-            const rep = repairOptions.find(r=>r.id===item.repairId);
-            if(!rep) return;
+            const rep = repairOptions.find(r => r.id === item.repairId);
+            if (!rep) return;
             name = rep.name;
             price = rep.price;
             total += price;
@@ -115,19 +147,19 @@ function checkoutOrder() {
     for (let item of cart) {
         const newId = orders.length + 1;
         if (item.type === 'product') {
-            const prod = products.find(p=>p.id===item.productId);
+            const prod = products.find(p => p.id === item.productId);
             orders.push({
                 id: newId, clientId: currentUser.id, clientName: currentUser.fullName, type: 'product',
                 productId: item.productId, repairId: null, status: 'new', managerId: null, jewelerId: null,
-                deadline: new Date(Date.now()+14*86400000).toISOString().slice(0,10),
-                total: prod.price * (item.quantity||1), completedDate: null, paymentStatus: 'pending'
+                deadline: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+                total: prod.price * (item.quantity || 1), completedDate: null, paymentStatus: 'pending'
             });
         } else {
-            const rep = repairOptions.find(r=>r.id===item.repairId);
+            const rep = repairOptions.find(r => r.id === item.repairId);
             orders.push({
                 id: newId, clientId: currentUser.id, clientName: currentUser.fullName, type: 'repair',
                 productId: null, repairId: item.repairId, status: 'new', managerId: null, jewelerId: null,
-                deadline: new Date(Date.now()+7*86400000).toISOString().slice(0,10),
+                deadline: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
                 total: rep.price, completedDate: null, paymentStatus: 'pending'
             });
         }
@@ -135,11 +167,12 @@ function checkoutOrder() {
     cart = []; saveCart(); updateCartBadge(); persist();
     const modalEl = document.getElementById('cartModal');
     const modal = bootstrap.Modal.getInstance(modalEl);
-    if(modal) modal.hide();
+    if (modal) modal.hide();
     showToast('Заказ оформлен! Менеджер свяжется.');
     renderClientDashboard();
 }
 
+// ========== 6. АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ ==========
 function showAuthModal() {
     const container = document.getElementById('authFormContainer');
     container.innerHTML = `
@@ -155,6 +188,7 @@ function showAuthModal() {
                 <input id="authLogin" class="form-control mb-2" placeholder="Логин">
                 <input id="authPassword" type="password" class="form-control mb-2" placeholder="Пароль">
                 <button id="doLoginBtn" class="btn-primary w-100">Войти</button>
+                <div class="small text-muted mt-2 text-center">Тест: client / client123</div>
             </div>
             <div class="tab-pane" id="registerTab">
                 <input id="regName" class="form-control mb-2" placeholder="Имя и фамилия">
@@ -204,28 +238,27 @@ function showAuthModal() {
 }
 function logout() { currentUser = null; sessionStorage.removeItem('granat_user'); cart = []; saveCart(); updateCartBadge(); renderApp(); showToast('Вы вышли'); }
 
+// ========== 7. АВАТАР ПОЛЬЗОВАТЕЛЯ ==========
 function updateProfileAvatar() {
     const avatarDiv = document.getElementById('profileAvatar');
     if (!avatarDiv) return;
     if (!currentUser) {
-        avatarDiv.innerHTML = `<i class="fas fa-user-circle" style="font-size: 1.6rem; color: var(--text-secondary);"></i>`;
-        avatarDiv.classList.add('default-icon');
+        avatarDiv.innerHTML = `<i class="fas fa-user-circle"></i>`;
         avatarDiv.onclick = () => showAuthModal();
         return;
     }
     let iconPath = '';
-    switch(currentUser.role) {
+    switch (currentUser.role) {
         case 'admin': iconPath = 'icons/admin.png'; break;
         case 'manager': iconPath = 'icons/manager.png'; break;
         case 'jeweler': iconPath = 'icons/jeweler.png'; break;
-        case 'client': iconPath = 'icons/client.png'; break;
-        default: iconPath = 'icons/default.png';
+        default: iconPath = 'icons/client.png';
     }
     avatarDiv.innerHTML = `<img src="${iconPath}" alt="${currentUser.role}" onerror="this.src='https://placehold.co/42x42'">`;
-    avatarDiv.classList.remove('default-icon');
     avatarDiv.onclick = logout;
 }
 
+// ========== 8. АНИМАЦИЯ ПРИ СКРОЛЛЕ ==========
 function initScrollAnimation() {
     const animatedElements = document.querySelectorAll('.animate-on-scroll');
     const observer = new IntersectionObserver((entries) => {
@@ -234,14 +267,21 @@ function initScrollAnimation() {
     animatedElements.forEach(el => observer.observe(el));
 }
 
+// ========== 9. ОСНОВНОЙ РЕНДЕР ==========
 function renderApp() {
     const saved = sessionStorage.getItem('granat_user');
-    if(saved && !currentUser) currentUser = JSON.parse(saved);
+    if (saved && !currentUser) currentUser = JSON.parse(saved);
     updateProfileAvatar();
-    if(!currentUser) {
+    if (!currentUser) {
+        renderCarousel();
         document.getElementById('dynamicContent').innerHTML = `
+            <div class="hero-section animate-on-scroll">
+                <h1>Изделия из серебра с гранатом</h1>
+                <p>Уникальные украшения ручной работы</p>
+                <button class="btn-primary" id="scrollToCatalog">Смотреть коллекцию</button>
+            </div>
             <div class="products-grid" id="catalogGrid">
-                ${products.map(p=>`<div class="product-card animate-on-scroll" data-id="${p.id}"><img src="${p.image}" class="product-img" onerror="this.src='https://placehold.co/300x300?text=${p.name}'"><div class="product-info"><div class="fw-semibold">${p.name}</div><div class="product-price">${p.price.toLocaleString()} ₽</div></div></div>`).join('')}
+                ${products.map(p => `<div class="product-card animate-on-scroll" data-id="${p.id}"><img src="${p.image}" class="product-img" onerror="this.src='https://placehold.co/300x300?text=${p.name}'"><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">${p.price.toLocaleString()} ₽</div></div></div>`).join('')}
             </div>
         `;
         document.querySelectorAll('.product-card').forEach(card => card.addEventListener('click', () => showProductModal(parseInt(card.dataset.id))));
@@ -249,15 +289,16 @@ function renderApp() {
         initScrollAnimation();
         return;
     }
-    if(currentUser.role === 'admin') renderAdminDashboard();
-    else if(currentUser.role === 'manager') renderManagerDashboard();
-    else if(currentUser.role === 'jeweler') renderJewelerDashboard();
+    if (currentUser.role === 'admin') renderAdminDashboard();
+    else if (currentUser.role === 'manager') renderManagerDashboard();
+    else if (currentUser.role === 'jeweler') renderJewelerDashboard();
     else renderClientDashboard();
     initScrollAnimation();
 }
 
+// ========== 10. МОДАЛЬНОЕ ОКНО ТОВАРА ==========
 function showProductModal(id) {
-    const p = products.find(p=>p.id===id);
+    const p = products.find(p => p.id === id);
     const body = document.getElementById('productModalBody');
     body.innerHTML = `
         <div class="text-center"><img src="${p.image}" class="img-fluid mb-3" style="max-height:250px;object-fit:cover;border-radius:20px;" onerror="this.src='https://placehold.co/400x300?text=${p.name}'"></div>
@@ -271,16 +312,17 @@ function showProductModal(id) {
     new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
+// ========== 11. КЛИЕНТСКАЯ ПАНЕЛЬ ==========
 function renderClientDashboard() {
     const myOrders = orders.filter(o => o.clientId === currentUser.id);
-    let ordersHtml = `<h3>Мои заказы</h3><div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Тип</th><th>Наименование</th><th>Статус</th><th>Сумма</th><th>Оплата</th><th>Действие</th></tr></thead><tbody>`;
+    let ordersHtml = `<h3>Мои заказы</h3><div class="table-wrapper"><table class="animate-on-scroll"><thead><tr><th>ID</th><th>Тип</th><th>Наименование</th><th>Статус</th><th>Сумма</th><th>Оплата</th><th>Действие</th></tr></thead><tbody>`;
     myOrders.forEach(o => {
         let name = '';
-        if(o.type === 'product') { const p = products.find(p=>p.id===o.productId); name = p ? p.name : 'Товар'; }
-        else { const r = repairOptions.find(r=>r.id===o.repairId); name = r ? r.name : 'Ремонт'; }
+        if (o.type === 'product') { const p = products.find(p => p.id === o.productId); name = p ? p.name : 'Товар'; }
+        else { const r = repairOptions.find(r => r.id === o.repairId); name = r ? r.name : 'Ремонт'; }
         ordersHtml += `<tr>
             <td>${o.id}</td>
-            <td>${o.type==='product'?'Изделие':'Ремонт'}</td>
+            <td>${o.type === 'product' ? 'Изделие' : 'Ремонт'}</td>
             <td>${name}</td>
             <td><span class="status-badge status-${o.status}">${o.status}</span></td>
             <td>${o.total}₽</td>
@@ -294,16 +336,17 @@ function renderClientDashboard() {
     document.getElementById('showCatalogBtn')?.addEventListener('click', () => showProductCatalog());
 }
 function showProductCatalog() {
-    document.getElementById('dynamicContent').innerHTML = `<div class="dashboard"><h2>Каталог изделий</h2><div class="products-grid">${products.map(p=>`<div class="product-card animate-on-scroll" data-id="${p.id}"><img src="${p.image}" class="product-img" onerror="this.src='https://placehold.co/300x300?text=${p.name}'"><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">${p.price.toLocaleString()} ₽</div><button class="btn-sm btn-primary mt-2" onclick="addToCart(${p.id})">В корзину</button></div></div>`).join('')}</div><button class="btn-outline mt-3" onclick="renderClientDashboard()">← Назад</button></div>`;
-    document.querySelectorAll('.product-card').forEach(card => { const id = parseInt(card.dataset.id); card.addEventListener('click', (e) => { if(!e.target.classList.contains('btn-primary')) showProductModal(id); }); });
+    document.getElementById('dynamicContent').innerHTML = `<div class="dashboard"><h2>Каталог изделий</h2><div class="products-grid">${products.map(p => `<div class="product-card animate-on-scroll" data-id="${p.id}"><img src="${p.image}" class="product-img" onerror="this.src='https://placehold.co/300x300?text=${p.name}'"><div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">${p.price.toLocaleString()} ₽</div><button class="btn-sm btn-primary mt-2" onclick="addToCart(${p.id})">В корзину</button></div></div>`).join('')}</div><button class="btn-outline mt-3" onclick="renderClientDashboard()">← Назад</button></div>`;
+    document.querySelectorAll('.product-card').forEach(card => { const id = parseInt(card.dataset.id); card.addEventListener('click', (e) => { if (!e.target.classList.contains('btn-primary')) showProductModal(id); }); });
     initScrollAnimation();
 }
 function showRepairCatalog() {
-    document.getElementById('dynamicContent').innerHTML = `<div class="dashboard"><h2>Услуги ремонта</h2><div class="list-group">${repairOptions.map(r=>`<div class="list-group-item animate-on-scroll"><div><strong>${r.name}</strong><br>${r.desc}<br>Цена: ${r.price}₽</div><button class="btn-sm btn-primary mt-2" onclick="addRepairToCart(${r.id})">В корзину</button></div>`).join('')}</div><button class="btn-outline mt-3" onclick="renderClientDashboard()">← Назад</button></div>`;
+    document.getElementById('dynamicContent').innerHTML = `<div class="dashboard"><h2>Услуги ремонта</h2><div class="list-group">${repairOptions.map(r => `<div class="list-group-item animate-on-scroll"><div><strong>${r.name}</strong><br>${r.desc}<br>Цена: ${r.price}₽</div><button class="btn-sm btn-primary mt-2" onclick="addRepairToCart(${r.id})">В корзину</button></div>`).join('')}</div><button class="btn-outline mt-3" onclick="renderClientDashboard()">← Назад</button></div>`;
     initScrollAnimation();
 }
-window.payOrder = function(orderId) { const order = orders.find(o => o.id === orderId); if(order) { order.paymentStatus = 'paid'; persist(); showToast('Заказ оплачен'); renderClientDashboard(); } };
+window.payOrder = function (orderId) { const order = orders.find(o => o.id === orderId); if (order) { order.paymentStatus = 'paid'; persist(); showToast('Заказ оплачен'); renderClientDashboard(); } };
 
+// ========== 12. АДМИНИСТРАТОР (сортировка товаров, история продаж) ==========
 let productsSortField = 'name';
 let productsSortOrder = 'asc';
 
@@ -314,174 +357,64 @@ function renderProductsTableForAdmin() {
     } else if (productsSortField === 'price') {
         sortedProducts.sort((a, b) => productsSortOrder === 'asc' ? a.price - b.price : b.price - a.price);
     }
-    let html = `<h3>Управление товарами</h3><div class="d-flex gap-2 mb-3 flex-wrap"><button id="sortNameAsc" class="btn-outline">Название А→Я</button><button id="sortNameDesc" class="btn-outline">Название Я→А</button><button id="sortPriceAsc" class="btn-outline">Цена ↑</button><button id="sortPriceDesc" class="btn-outline">Цена ↓</button></div><div class="table-wrapper"><table class="table"><thead><tr><th>Изображение</th><th>Название</th><th>Цена</th><th>Артикул</th><th>Материал</th></tr></thead><tbody>${sortedProducts.map(p => `<tr><td><img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:12px;" onerror="this.src='https://placehold.co/50x50'"></td><td>${p.name}</td><td>${p.price.toLocaleString()} ₽</td><td>${p.article}</td><td>${p.material}</td>`).join('')}</tbody></table></div>`;
+    let html = `<h3>Управление товарами</h3><div class="d-flex gap-2 mb-3 flex-wrap"><button id="sortNameAsc" class="btn-outline">Название А→Я</button><button id="sortNameDesc" class="btn-outline">Название Я→А</button><button id="sortPriceAsc" class="btn-outline">Цена ↑</button><button id="sortPriceDesc" class="btn-outline">Цена ↓</button></div><div class="table-wrapper"><table class="animate-on-scroll"><thead><tr><th>Изображение</th><th>Название</th><th>Цена</th><th>Артикул</th><th>Материал</th><tr></thead><tbody>${sortedProducts.map(p => `<tr>
+        <td><img src="${p.image}" style="width:50px;height:50px;object-fit:cover;border-radius:12px;" onerror="this.src='https://placehold.co/50x50'"></td>
+        <td>${p.name}</td>
+        <td>${p.price.toLocaleString()} ₽</td><td>${p.article}</td>
+        <td>${p.material}</td>
+    </tr>`).join('')}</tbody></table></div>`;
     document.getElementById('adminContent').innerHTML = html;
-    document.getElementById('sortNameAsc')?.addEventListener('click', () => { productsSortField='name'; productsSortOrder='asc'; renderProductsTableForAdmin(); });
-    document.getElementById('sortNameDesc')?.addEventListener('click', () => { productsSortField='name'; productsSortOrder='desc'; renderProductsTableForAdmin(); });
-    document.getElementById('sortPriceAsc')?.addEventListener('click', () => { productsSortField='price'; productsSortOrder='asc'; renderProductsTableForAdmin(); });
-    document.getElementById('sortPriceDesc')?.addEventListener('click', () => { productsSortField='price'; productsSortOrder='desc'; renderProductsTableForAdmin(); });
+    document.getElementById('sortNameAsc')?.addEventListener('click', () => { productsSortField = 'name'; productsSortOrder = 'asc'; renderProductsTableForAdmin(); });
+    document.getElementById('sortNameDesc')?.addEventListener('click', () => { productsSortField = 'name'; productsSortOrder = 'desc'; renderProductsTableForAdmin(); });
+    document.getElementById('sortPriceAsc')?.addEventListener('click', () => { productsSortField = 'price'; productsSortOrder = 'asc'; renderProductsTableForAdmin(); });
+    document.getElementById('sortPriceDesc')?.addEventListener('click', () => { productsSortField = 'price'; productsSortOrder = 'desc'; renderProductsTableForAdmin(); });
 }
 
 function renderAdminDashboard() {
-    const totalOrders = orders.length, completed = orders.filter(o=>o.status==='completed').length, revenue = orders.filter(o=>o.status==='completed').reduce((s,o)=>s+o.total,0);
-    let html = `<div class="dashboard"><h2>Админ панель</h2><div class="stats-grid"><div class="stat-card"><h3>${totalOrders}</h3><p>Заказов</p></div><div class="stat-card"><h3>${completed}</h3><p>Завершено</p></div><div class="stat-card"><h3>${revenue.toLocaleString()} ₽</h3><p>Выручка</p></div></div><div><button id="adminOrdersBtn" class="btn-primary">Заказы</button> <button id="adminProductsBtn" class="btn-primary">Товары</button> <button id="adminMaterialsBtn" class="btn-outline">Материалы</button> <button id="adminSalesBtn" class="btn-outline">История продаж</button> <button id="adminUsersBtn" class="btn-outline">Пользователи</button> <button id="adminBackCatalog" class="btn-outline">На сайт</button></div><div id="adminContent"></div></div>`;
+    const totalOrders = orders.length, completed = orders.filter(o => o.status === 'completed').length, revenue = orders.filter(o => o.status === 'completed').reduce((s, o) => s + o.total, 0);
+    let html = `<div class="dashboard"><h2>Админ панель</h2><div class="stats-grid"><div class="stat-card animate-on-scroll"><h3>${totalOrders}</h3><p>Заказов</p></div><div class="stat-card animate-on-scroll"><h3>${completed}</h3><p>Завершено</p></div><div class="stat-card animate-on-scroll"><h3>${revenue.toLocaleString()} ₽</h3><p>Выручка</p></div></div><div><button id="adminOrdersBtn" class="btn-primary">Заказы</button> <button id="adminProductsBtn" class="btn-primary">Товары</button> <button id="adminMaterialsBtn" class="btn-outline">Материалы</button> <button id="adminSalesBtn" class="btn-outline">История продаж</button> <button id="adminUsersBtn" class="btn-outline">Пользователи</button> <button id="adminBackCatalog" class="btn-outline">На сайт</button></div><div id="adminContent"></div></div>`;
     document.getElementById('app').innerHTML = html;
     document.getElementById('adminOrdersBtn').onclick = () => renderOrdersTable();
     document.getElementById('adminProductsBtn').onclick = () => renderProductsTableForAdmin();
     document.getElementById('adminMaterialsBtn').onclick = () => renderMaterialsTable();
     document.getElementById('adminSalesBtn').onclick = () => renderSalesHistory();
     document.getElementById('adminUsersBtn').onclick = () => renderUsersTable();
-    document.getElementById('adminBackCatalog').onclick = () => { currentUser = null; sessionStorage.removeItem('granat_user'); cart=[]; saveCart(); renderApp(); };
+    document.getElementById('adminBackCatalog').onclick = () => { currentUser = null; sessionStorage.removeItem('granat_user'); cart = []; saveCart(); renderApp(); };
     renderOrdersTable();
 }
 function renderOrdersTable() {
-    let html = `<h3>Заказы</h3><button id="createOrderAdmin" class="btn-primary mb-2">+ Новый заказ</button><div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Тип</th><th>Статус</th><th>Сумма</th><th>Оплата</th><th>Действие</th></tr></thead><tbody>${orders.map(o=>`<tr>
+    let html = `<h3>Заказы</h3><button id="createOrderAdmin" class="btn-primary mb-2">+ Новый заказ</button><div class="table-wrapper"><table class="animate-on-scroll"><thead><tr><th>ID</th><th>Клиент</th><th>Тип</th><th>Статус</th><th>Сумма</th><th>Оплата</th><th>Действие</th></tr></thead><tbody>${orders.map(o => `<tr>
         <td>${o.id}</td>
         <td>${o.clientName}</td>
         <td>${o.type}</td>
         <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-        <td>${o.total}₽</td>
-        <td>${o.paymentStatus}</td>
+        <td>${o.total}₽</td><td>${o.paymentStatus}</td>
         <td><button class="btn-sm btn-outline" onclick="window.changeOrderStatus(${o.id})">Статус</button></td>
     </tr>`).join('')}</tbody></table></div>`;
     document.getElementById('adminContent').innerHTML = html;
     document.getElementById('createOrderAdmin')?.addEventListener('click', () => showCreateOrderForm());
 }
 function renderMaterialsTable() {
-    document.getElementById('adminContent').innerHTML = `<h3>Материалы</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Материал</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>${materials.map(m=>`<tr>
+    document.getElementById('adminContent').innerHTML = `<h3>Материалы</h3><div class="table-wrapper"><table class="animate-on-scroll"><thead><tr><th>Материал</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>${materials.map(m => `<tr>
         <td>${m.name}</td>
         <td>${m.quantity} ${m.unit}</td>
         <td>${m.pricePerUnit}₽</td>
     </tr>`).join('')}</tbody></table></div>`;
 }
 function renderSalesHistory() {
-    let completed = orders.filter(o=>o.status==='completed');
+    let completed = orders.filter(o => o.status === 'completed');
     let html = `<h3>История продаж</h3><div class="filter-bar"><input type="date" id="salesFrom"><input type="date" id="salesTo"><button id="applySalesFilter" class="btn-primary">Фильтр</button></div><div id="salesTable"></div>`;
     document.getElementById('adminContent').innerHTML = html;
     function renderFiltered() {
         const from = document.getElementById('salesFrom').value, to = document.getElementById('salesTo').value;
         let filtered = completed;
-        if(from) filtered = filtered.filter(o=>o.completedDate >= from);
-        if(to) filtered = filtered.filter(o=>o.completedDate <= to);
-        let table = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Сумма</th><th>Дата</th></tr></thead><tbody>${filtered.map(o=>`<tr>
+        if (from) filtered = filtered.filter(o => o.completedDate >= from);
+        if (to) filtered = filtered.filter(o => o.completedDate <= to);
+        let table = `<div class="table-wrapper"><table class="animate-on-scroll"><thead><tr><th>ID</th><th>Клиент</th><th>Сумма</th><th>Дата</th></tr></thead><tbody>${filtered.map(o => `<tr>
             <td>${o.id}</td>
             <td>${o.clientName}</td>
-            <td>${o.total}₽</td>
-            <td>${o.completedDate}</td>
-        </tr>`).join('')}</tbody></table></div><p>Итого: ${filtered.reduce((s,o)=>s+o.total,0).toLocaleString()}₽</p>`;
+            <td>${o.total}₽</td><td>${o.completedDate}</td>
+        </tr>`).join('')}</tbody></table></div><p>Итого: ${filtered.reduce((s, o) => s + o.total, 0).toLocaleString()}₽</p>`;
         document.getElementById('salesTable').innerHTML = table;
     }
-    document.getElementById('applySalesFilter').onclick = renderFiltered;
-    renderFiltered();
-}
-function renderUsersTable() {
-    let html = `<h3>Пользователи</h3><button id="addUserBtn" class="btn-primary mb-2">+ Сотрудник</button><div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Логин</th><th>Имя</th><th>Роль</th><th>Действие</th></tr></thead><tbody>${users.map(u=>`<td>
-        <td>${u.id}</td>
-        <td>${u.login}</td>
-        <td>${u.fullName}</td>
-        <td>${u.role}</td>
-        <td>${u.id !== currentUser.id ? `<button class="btn-sm btn-outline" onclick="window.deleteUser(${u.id})">Удалить</button>` : '—'}</td>
-    </tr>`).join('')}</tbody></table></div>`;
-    document.getElementById('adminContent').innerHTML = html;
-    document.getElementById('addUserBtn')?.addEventListener('click', () => {
-        const login = prompt('Логин сотрудника');
-        if(login) {
-            const pwd = prompt('Пароль');
-            const name = prompt('Полное имя');
-            const role = prompt('Роль (manager/jeweler)');
-            if(login && pwd && name && role) {
-                users.push({id: users.length+1, login, password: pwd, role, fullName: name, phone: '', address: ''});
-                persist(); renderUsersTable(); showToast('Сотрудник добавлен');
-            }
-        }
-    });
-}
-window.deleteUser = function(id) { if(id===currentUser.id) return showToast('Нельзя себя',true); users = users.filter(u=>u.id!==id); persist(); renderUsersTable(); showToast('Удалён'); };
-function showCreateOrderForm() {
-    const clients = users.filter(u=>u.role==='client');
-    const prodOptions = products.map(p=>`<option value="${p.id}">${p.name} (${p.price}₽)</option>`).join('');
-    document.getElementById('adminContent').innerHTML = `<div><h3>Новый заказ</h3><select id="orderClient">${clients.map(c=>`<option value="${c.id}">${c.fullName}</option>`)}</select><select id="orderProduct">${prodOptions}</select><input type="date" id="orderDeadline"><button id="saveNewOrder" class="btn-primary mt-2">Сохранить</button><button id="cancelOrder" class="btn-outline mt-2">Отмена</button></div>`;
-    document.getElementById('saveNewOrder').onclick = () => {
-        const clientId = parseInt(document.getElementById('orderClient').value), productId = parseInt(document.getElementById('orderProduct').value), deadline = document.getElementById('orderDeadline').value, product = products.find(p=>p.id===productId);
-        const newId = orders.length+1;
-        orders.push({ id: newId, clientId, clientName: users.find(u=>u.id===clientId).fullName, type: 'product', productId, repairId: null, status: 'new', managerId: currentUser.id, jewelerId: null, deadline, total: product.price, completedDate: null, paymentStatus: 'pending' });
-        persist(); renderOrdersTable(); showToast('Заказ создан');
-    };
-    document.getElementById('cancelOrder').onclick = () => renderOrdersTable();
-}
-window.changeOrderStatus = function(id) { let s = prompt('Новый статус (new, in_progress, completed, cancelled)'); if(s){ let o = orders.find(o=>o.id===id); if(o){ o.status=s; if(s==='completed') o.completedDate=new Date().toISOString().slice(0,10); persist(); renderOrdersTable(); } } };
-
-function renderManagerDashboard() {
-    let html = `<div class="dashboard"><h2>Панель менеджера</h2><div><button id="managerOrdersBtn" class="btn-primary">Заказы</button> <button id="managerMaterialsBtn" class="btn-outline">Материалы</button> <button id="managerBackCatalog" class="btn-outline">На сайт</button></div><div id="managerContent"></div></div>`;
-    document.getElementById('app').innerHTML = html;
-    document.getElementById('managerOrdersBtn').onclick = () => renderManagerOrders();
-    document.getElementById('managerMaterialsBtn').onclick = () => renderMaterialsTableForRole('manager');
-    document.getElementById('managerBackCatalog').onclick = () => { currentUser = null; sessionStorage.removeItem('granat_user'); cart=[]; saveCart(); renderApp(); };
-    renderManagerOrders();
-}
-function renderManagerOrders() {
-    let html = `<h3>Управление заказами</h3><button id="createOrderMgr" class="btn-primary mb-2">+ Новый заказ</button><div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Тип</th><th>Статус</th><th>Сумма</th><th>Действие</th></tr></thead><tbody>${orders.map(o=>`<tr>
-        <td>${o.id}</td>
-        <td>${o.clientName}<td>
-        <td>${o.type}</td>
-        <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-        <td>${o.total}₽</td>
-        <td><button class="btn-sm btn-outline" onclick="window.changeOrderStatus(${o.id})">Изменить статус</button></td>
-    </tr>`).join('')}</tbody></table></div>`;
-    document.getElementById('managerContent').innerHTML = html;
-    document.getElementById('createOrderMgr')?.addEventListener('click', () => showCreateOrderFormForManager());
-}
-function showCreateOrderFormForManager() {
-    const clients = users.filter(u=>u.role==='client');
-    const prodOptions = products.map(p=>`<option value="${p.id}">${p.name} (${p.price}₽)</option>`).join('');
-    document.getElementById('managerContent').innerHTML = `<div><h3>Новый заказ</h3><select id="orderClientMgr">${clients.map(c=>`<option value="${c.id}">${c.fullName}</option>`)}</select><select id="orderProductMgr">${prodOptions}</select><input type="date" id="deadlineMgr"><button id="saveOrderMgr" class="btn-primary mt-2">Сохранить</button><button id="cancelMgr" class="btn-outline mt-2">Отмена</button></div>`;
-    document.getElementById('saveOrderMgr').onclick = () => {
-        const clientId = parseInt(document.getElementById('orderClientMgr').value), productId = parseInt(document.getElementById('orderProductMgr').value), deadline = document.getElementById('deadlineMgr').value, product = products.find(p=>p.id===productId);
-        const newId = orders.length+1;
-        orders.push({ id: newId, clientId, clientName: users.find(u=>u.id===clientId).fullName, type: 'product', productId, repairId: null, status: 'new', managerId: currentUser.id, jewelerId: null, deadline, total: product.price, completedDate: null, paymentStatus: 'pending' });
-        persist(); renderManagerOrders(); showToast('Заказ создан');
-    };
-    document.getElementById('cancelMgr').onclick = () => renderManagerOrders();
-}
-function renderMaterialsTableForRole(role) {
-    const container = role === 'manager' ? 'managerContent' : 'jewelerContent';
-    const html = `<h3>Склад материалов (просмотр)</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Материал</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>${materials.map(m=>`<tr>
-        <td>${m.name}</td>
-        <td>${m.quantity} ${m.unit}</td>
-        <td>${m.pricePerUnit}₽</td>
-    </tr>`).join('')}</tbody></table></div><button class="btn-outline mt-2" onclick="${role === 'manager' ? 'renderManagerDashboard()' : 'renderJewelerDashboard()'}">← Назад</button>`;
-    document.getElementById(container).innerHTML = html;
-}
-
-function renderJewelerDashboard() {
-    const myOrders = orders.filter(o => o.jewelerId === currentUser.id);
-    let html = `<div class="dashboard"><h2>Мои заказы (ювелир)</h2><div><button id="jewelerOrdersBtn" class="btn-primary">Мои заказы</button> <button id="jewelerMaterialsBtn" class="btn-outline">Материалы</button> <button id="jewelerBackCatalog" class="btn-outline">На сайт</button></div><div id="jewelerContent"></div></div>`;
-    document.getElementById('app').innerHTML = html;
-    document.getElementById('jewelerOrdersBtn').onclick = () => renderJewelerOrders(myOrders);
-    document.getElementById('jewelerMaterialsBtn').onclick = () => renderMaterialsTableForRole('jeweler');
-    document.getElementById('jewelerBackCatalog').onclick = () => { currentUser = null; sessionStorage.removeItem('granat_user'); cart=[]; saveCart(); renderApp(); };
-    renderJewelerOrders(myOrders);
-}
-function renderJewelerOrders(myOrders) {
-    let html = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Тип</th><th>Статус</th><th>Сумма</th><th>Действие</th></tr></thead><tbody>`;
-    myOrders.forEach(o => {
-        html += `<tr>
-            <td>${o.id}</td>
-            <td>${o.clientName}</td>
-            <td>${o.type}</td>
-            <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-            <td>${o.total}₽</td>
-            <td>${o.status !== 'completed' ? `<button class="btn-sm btn-primary" onclick="window.completeOrder(${o.id})">Завершить</button>` : '—'}</td>
-        </tr>`;
-    });
-    html += `</tbody></table></div>`;
-    document.getElementById('jewelerContent').innerHTML = html;
-}
-window.completeOrder = function(orderId) { const order = orders.find(o=>o.id===orderId); if(order) { order.status='completed'; order.completedDate=new Date().toISOString().slice(0,10); persist(); renderJewelerDashboard(); showToast('Заказ завершён'); } };
-
-loadCart();
-updateCartBadge();
-renderApp();
-window.addToCart = addToCart;
-window.addRepairToCart = addRepairToCart;
-window.removeFromCart = removeFromCart;
+    document.getElementById('applySalesFilter').on 
