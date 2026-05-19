@@ -7,16 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- Стабильные версии для .NET 9 (совместимы с .NET 10) -->
+		<!-- Стабильные версии для .NET 9 (совместима с .NET 10) -->
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Новая папка\" />
 	</ItemGroup>
 
 </Project> 

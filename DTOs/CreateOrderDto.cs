@@ -1,4 +1,5 @@
-﻿namespace CRM_Granat.DTOs;
+﻿
+namespace CRM_Granat.DTOs;
 
 public class CartItemDto
 {

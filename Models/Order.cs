@@ -1,4 +1,5 @@
-﻿namespace CRM_Granat.Models
+﻿
+namespace CRM_Granat.Models
 {
     public class Order
     {

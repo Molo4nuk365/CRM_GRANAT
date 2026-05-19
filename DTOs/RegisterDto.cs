@@ -1,6 +1,5 @@
 ﻿
 namespace CRM_Granat.DTOs;
-
 public class RegisterDto
 {
     public string Login { get; set; }

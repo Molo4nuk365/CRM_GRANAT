@@ -1,8 +1,8 @@
-﻿using System;
+﻿
+namespace  CRM_Granat.DTOs;
 
-public class Class1
+public class LoginDto
 {
-	public Class1()
-	{
-	}
+    public string Login { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
