@@ -1,0 +1,12 @@
+
+services:
+  api:
+    build: .
+    container_name: granat_api
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=LAPTOP-QU8TEID8\\SQLEXPRESS02;Database=GRM_GRANAT;Trusted_Connection=True;TrustServerCertificate=true;
+    restart: unless-stopped

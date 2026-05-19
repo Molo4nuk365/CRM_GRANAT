@@ -1,0 +1,28 @@
+# Папки с результатами сборки
+bin/
+obj/
+
+# Пользовательские настройки IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Файлы конфигурации разработки (не нужны в образе)
+appsettings.Development.json
+
+# Базы данных (локальные)
+*.db
+*.sqlite
+*.mdf
+*.ldf
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.cache
+
+# Git
+.git/
+.gitignore
+README.md

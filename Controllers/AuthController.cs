@@ -52,19 +52,20 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Неверный логин или пароль" });
 
         var token = GenerateJwtToken(user);
-        return Ok(new
+        return Ok
+            (new
         {
             user.Id,
             user.Login,
             user.Role,
             user.FullName,
             Token = token
-        });
+        } );
     }
 
     private string GenerateJwtToken(User user)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config ["Jwt:Key"] ));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {

@@ -1,10 +1,11 @@
-﻿using CRM_Granat.Data;
+﻿using BCrypt.Net;
+using CRM_Granat.Data;
 using CRM_Granat.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GranatCRM.Controllers;
+namespace CRM_Granat.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

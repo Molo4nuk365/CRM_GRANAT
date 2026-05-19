@@ -41,7 +41,7 @@ public static class SeedData
         db.Materials.AddRange(materials);
         db.SaveChanges();
 
-        var repairs = new RepairOption[]
+        var repairs = new RepairOption[]   
         {
             new RepairOption { Name = "Ремонт кольца", Price = 3500, Description = "Пайка, полировка, изменение размера" },
             new RepairOption { Name = "Ремонт серёг", Price = 2800, Description = "Замена замка, полировка" },

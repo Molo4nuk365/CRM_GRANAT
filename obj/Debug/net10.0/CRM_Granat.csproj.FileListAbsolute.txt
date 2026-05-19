@@ -1,9 +1,0 @@
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.csproj.AssemblyReference.cache
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\rpswa.dswa.cache.json
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.GeneratedMSBuildEditorConfig.editorconfig
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.AssemblyInfoInputs.cache
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.AssemblyInfo.cs
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.csproj.CoreCompileInputs.cache
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.MvcApplicationPartsAssemblyInfo.cs
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.MvcApplicationPartsAssemblyInfo.cache
-D:\CRM_Granat\CRM_Granat\obj\Debug\net10.0\CRM_Granat.sourcelink.json

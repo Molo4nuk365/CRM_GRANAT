@@ -1,13 +1,11 @@
-﻿
-#nullable disable
-namespace CRM_Granat.DTOs;
+﻿#nullable disable
+
+namespace CRM_Granat.Models;
 
 public class RepairOption
 {
-    public string Login { get; set; }
-    public string Password { get; set; }
-    public string FullName { get; set; }
-    public string Phone { get; set; }
-    public string Address { get; set; }
-    public string Role { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+    public string Description { get; set; }
 }

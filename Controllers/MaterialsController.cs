@@ -1,4 +1,5 @@
-﻿using CRM_Granat.Data;
+﻿using BCrypt.Net;
+using CRM_Granat.Data;
 using CRM_Granat.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
