@@ -1,1 +1,23 @@
+## .NET
+bin/
 obj/
+*.user
+*.suo
+*.cache
+*.tmp
+*.db
+*.sqlite
+
+## Visual Studio
+.vs/
+*.vsidx
+*.slnx
+*.suo
+
+## IDE
+.idea/
+.vscode/
+
+## Docker
+*.db-shm
+*.db-wal
