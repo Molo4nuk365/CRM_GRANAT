@@ -37,7 +37,7 @@ body {
     position: relative;
     width: 100vw;
     min-height: 100vh;
-    margin-left: calc(-20vw + 20%);
+    margin-left: calc(-50vw + 50%);
     background-image: url('/images/гранат2.png');
     background-size: cover;
     background-position: center;
