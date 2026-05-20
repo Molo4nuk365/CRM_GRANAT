@@ -63,7 +63,7 @@ async function loadProductsFromAPI() {
         products = await apiFetch('/api/products');
     } catch (e) {
         console.warn('Ошибка загрузки продуктов, использую заглушку:', e);
-        products = [ { productId: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, description: "Серебро 925, гранат 0.8 карат", material: "Серебро 925, гранат", weight: "3.2 г", article: "GR-101", imageUrl: "/images/кольцо.png" },
+        products = [ { productId: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, description: "Серебро 925, гранат 0.8 карат", material: "Серебро 925, гранат", weight: "3.2 г", article: "GR-101", imageUrl: "/images/кольцо.png"},
             { productId: 2, name: "Серьги «Лунный свет»", price: 12400, description: "Серебро 925, гранат 0.5 карат", material: "Серебро 925, гранат", weight: "4.5 г", article: "GR-102", imageUrl: "/images/серьги.png" },
             { productId: 3, name: "Подвеска «Капля росы»", price: 9800, description: "Серебро 925, гранат 2 карат", material: "Серебро 925, гранат", weight: "1.8 г", article: "GR-103", imageUrl: "/images/подвеска.jpg" },
             { productId: 4, name: "Браслет «Серебряная нить»", price: 23500, description: "Серебро 925", material: "Серебро 925", weight: "6.2 г", article: "GR-104", imageUrl: "/images/браслет.png" },
