@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BCrypt.Net;
+using CRM_Jewelry_workshop.Data;
+using CRM_Jewelry_workshop.DTOs;
+using CRM_Jewelry_workshop.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BCrypt.Net;
-using CRM_Jewelry_workshop.Data;
-using CRM_Jewelry_workshop.DTOs;
-using CRM_Jewelry_workshop.Models;
-using System.Data.Entity;
-using Microsoft.EntityFrameworkCore;
 
 namespace CRM_Jewelry_workshop.Controllers;
 
@@ -37,7 +36,7 @@ public class AuthController : BaseController
         var user = new User
         {
             Login = dto.Login,
-            PasswordHash = BCrypt.HashPassword(dto.Password),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             FullName = dto.FullName,
             Email = dto.Email,
             Phone = dto.Phone,
@@ -57,8 +56,8 @@ public class AuthController : BaseController
             .FirstOrDefaultAsync(u => u.Login == dto.Login);
 
         if (user == null
-            || !BCrypt.Verify(dto.Password, user.PasswordHash))
-            return Unauthorized(new { message = "Неверный логин или пароль" });
+            || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+        return Unauthorized(new { message = "Неверный логин или пароль" });
 
         var token = GenerateJwtToken(user);
         return Ok(new

@@ -1,8 +1,5 @@
-﻿using CRM_Jewelry_workshop.Models;
-using SharpDX.Direct3D9;
-using StackExchange.Redis;
-using System.Data.Entity;
-using System.Reflection.Emit;
+﻿using Microsoft.EntityFrameworkCore;
+using CRM_Jewelry_workshop.Models;
 
 
 namespace CRM_Jewelry_workshop.Data;

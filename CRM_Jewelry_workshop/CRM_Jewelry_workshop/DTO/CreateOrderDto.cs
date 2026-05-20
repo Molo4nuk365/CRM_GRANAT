@@ -1,6 +1,13 @@
-﻿namespace CRM_Jewelry_workshop.DTO
+﻿namespace CRM_Jewelry_workshop.DTOs;
+
+public class CartItemDto
 {
-    public class CreateOrderDto
-    {
-    }
+    public string Type { get; set; } = "product"; // product или repair
+    public int Id { get; set; }
+    public int Quantity { get; set; } = 1;
+}
+
+public class CreateOrderDto
+{
+    public List<CartItemDto> Items { get; set; } = new();
 }
