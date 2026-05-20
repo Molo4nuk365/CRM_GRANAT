@@ -8,7 +8,9 @@ public static class SeedData
     public static void Initialize(AppDbContext db)
 
     {
-        if (db.Roles.Any()) return;
+        if (db.Roles.Any())
+            
+            return;
 
         // Добавляем роли
         var roles = new[]

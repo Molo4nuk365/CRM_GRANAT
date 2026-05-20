@@ -6,7 +6,7 @@ let repairOptions = [];         // загружаются с API
 let sortField = 'name';        // 'name' или 'price'
 let sortOrder = 'asc';         // 'asc' или 'desc'
 
-//  DOM элементы 
+//DOM элементы 
 const themeToggle = document.getElementById('themeToggle');
 const profileAvatar = document.getElementById('profileAvatar');
 const cartBtn = document.getElementById('cartBtn');
@@ -14,7 +14,7 @@ const cartCountSpan = document.getElementById('cartCount');
 const dynamicContent = document.getElementById('dynamicContent');
 const toastMsg = document.getElementById('toastMsg');
 
-// Утилиты
+//Утилиты
 function showToast(msg, isError = false) {
     toastMsg.textContent = msg;
     toastMsg.style.background = isError ? '#d9534f' : 'var(--accent)';
@@ -22,7 +22,7 @@ function showToast(msg, isError = false) {
     setTimeout(() => toastMsg.classList.remove('show'), 2500);
 }
 
-// Сохранение/загрузка корзины
+//Сохранение/загрузка корзины
 function saveCart() {
     localStorage.setItem('granat_cart', JSON.stringify(cart));
 }
@@ -36,62 +36,74 @@ function updateCartBadge() {
     cartCountSpan.innerText = count;
 }
 
-// API вызовы с токеном 
-async function apiFetch(url, options = {})
-{
-    const headers = { 'Content-Type': 'application/json' };
-    if (currentUser && currentUser.token) {
+//API вызовы с токеном (токен используется для защиты данных)
+async function apiFetch(url, options = {}) {
+    const headers =
+    {
+        'Content-Type': 'application/json'
+    };
+    if (currentUser && currentUser.token)
+    {
         headers['Authorization'] = `Bearer ${currentUser.token}`;
     }
-    const res = await fetch(url, { ...options, headers });
+    const res = await fetch
+        (url,
+            {
+                ...options, headers
+            });
     if (res.status === 401)
     {
         logout();
         showToast('Сессия истекла, войдите снова', true);
         throw new Error('Unauthorized');
     }
-    if (!res.ok) {
+    if (!res.ok)
+    {
         const err = await res.text();
         throw new Error(err);
     }
     return res.json();
 }
 
-// Загрузка продуктов и ремонтов с бэкенда
+//Загрузка продуктов и ремонтов с бэкенда
 async function loadProductsFromAPI() {
     try {
         products = await apiFetch('/api/products');
-    } catch (e) {
+    } catch (e)
+    {
         console.warn('Ошибка загрузки продуктов, использую заглушку:', e);
-        products = [ { productId: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, description: "Серебро 925, гранат 0.8 карат", material: "Серебро 925, гранат", weight: "3.2 г", article: "GR-101", imageUrl: "/images/кольцо.png"},
+        products = [{ productId: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, description: "Серебро 925, гранат 0.8 карат", material: "Серебро 925, гранат", weight: "3.2 г", article: "GR-101", imageUrl: "/images/кольцо.png" },
             { productId: 2, name: "Серьги «Лунный свет»", price: 12400, description: "Серебро 925, гранат 0.5 карат", material: "Серебро 925, гранат", weight: "4.5 г", article: "GR-102", imageUrl: "/images/серьги.png" },
             { productId: 3, name: "Подвеска «Капля росы»", price: 9800, description: "Серебро 925, гранат 2 карат", material: "Серебро 925, гранат", weight: "1.8 г", article: "GR-103", imageUrl: "/images/подвеска.jpg" },
             { productId: 4, name: "Браслет «Серебряная нить»", price: 23500, description: "Серебро 925", material: "Серебро 925", weight: "6.2 г", article: "GR-104", imageUrl: "/images/браслет.png" },
-            { productId: 5, name: "Брошь «Гранат»", price: 15900, description: "Серебро 925, гранат 2 карат", material: "Серебро 925, гранат", weight: "5.1 г", article: "GR-105", imageUrl: "/images/брошь.jpg" } ];
+            { productId: 5, name: "Брошь «Гранат»", price: 15900, description: "Серебро 925, гранат 2 карат", material: "Серебро 925, гранат", weight: "5.1 г", article: "GR-105", imageUrl: "/images/брошь.jpg" }];
     }
 }
 async function loadRepairsFromAPI() {
-    try {
-        repairOptions = await apiFetch('/api/repairoptions');
-    } catch (e)
+    try
     {
-        repairOptions = [ { id: 101, name: "Ремонт кольца", price: 3500, desc: "Пайка, полировка, изменение размера" },
+        repairOptions = await apiFetch('/api/repairoptions');
+    } catch (e) {
+        repairOptions = [
+            { id: 101, name: "Ремонт кольца", price: 3500, desc: "Пайка, полировка, изменение размера" },
             { id: 102, name: "Ремонт серёг", price: 2800, desc: "Замена замка, полировка" },
             { id: 103, name: "Ремонт цепочки", price: 2200, desc: "Пайка звеньев, замена замка" },
-            { id: 104, name: "Чистка и полировка", price: 1200, desc: "Ультразвуковая чистка, полировка" } ];
+            { id: 104, name: "Чистка и полировка", price: 1200, desc: "Ультразвуковая чистка, полировка" }
+        ];
     }
 }
 
-//  Тёмная тема 
+//Тёмная тема 
 if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-theme');
     localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
 });
 
-// Аватар и выход 
+//Аватар и выход 
 function updateProfileAvatar() {
-    if (!currentUser) {
+    if (!currentUser)
+    {
         profileAvatar.innerHTML = `<i class="fas fa-user-circle" style="font-size: 1.6rem; color: var(--text-secondary);"></i>`;
         profileAvatar.classList.add('default-icon');
         profileAvatar.onclick = () => showAuthModal();
@@ -117,7 +129,7 @@ function logout() {
     showToast('Вы вышли');
 }
 
-// Авторизация
+//Авторизация
 function showAuthModal() {
     const container = document.getElementById('authFormContainer');
     container.innerHTML = `
@@ -147,24 +159,26 @@ function showAuthModal() {
     const modal = new bootstrap.Modal(document.getElementById('authModal'));
     modal.show();
 
-    document.getElementById('doLoginBtn')?.addEventListener('click', async () =>
-    {
+    document.getElementById('doLoginBtn')?.addEventListener('click', async () => {
         const login = document.getElementById('authLogin').value.trim();
         const pwd = document.getElementById('authPassword').value.trim();
         if (!login || !pwd)
         {
             showToast('Введите логин и пароль', true);
+
             return;
         }
         try {
-            const res = await fetch('/api/auth/login',
-                {
+            const res = await fetch('/api/auth/login', {
                 method: 'POST',
-                    headers:
-                    {
-                        'Content-Type': 'application/json'
-                    },
-                body: JSON.stringify({ login, password: pwd })
+                headers:
+                {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    login, password: pwd
+                })
             });
             if (!res.ok) throw new Error('Неверный логин или пароль');
             const data = await res.json();
@@ -182,7 +196,9 @@ function showAuthModal() {
             await loadProductsFromAPI();
             await loadRepairsFromAPI();
             renderApp();
-        } catch (err) {
+        } catch (err)
+
+        {
             showToast(err.message, true);
         }
     });
@@ -194,27 +210,35 @@ function showAuthModal() {
         const pwd = document.getElementById('regPassword').value.trim();
         const phone = document.getElementById('regPhone').value.trim();
         const address = document.getElementById('regAddress').value.trim();
-        if (!name || !login || !pwd) {
-            showToast('Имя, логин и пароль обязательны', true); return;
+
+        if (!name || !login || !pwd)
+        {
+            showToast('Имя, логин и пароль обязательны', true);
+
+            return;
         }
         try {
             const res = await fetch('/api/auth/register',
-                {
-                method: 'POST',
-                headers:
-                    {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(
-                        {
-                    login, password: pwd, fullName: name, phone, address, email: ""
-                })
+
+            {
+               method: 'POST',
+               headers:
+               {
+               'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(
+
+               {
+                login, password: pwd, fullName: name, phone, address, email: ""
+               })
             });
-            if (!res.ok) {
+            if (!res.ok)
+            {
                 const text = await res.text();
                 throw new Error(text || 'Ошибка регистрации');
             }
             showToast('Регистрация успешна! Теперь войдите.');
+
             const loginTabBtn = document.querySelector('#authTab button[data-bs-target="#loginTab"]');
             if (loginTabBtn) new bootstrap.Tab(loginTabBtn).show();
         } catch (err) {
@@ -223,7 +247,7 @@ function showAuthModal() {
     });
 }
 
-// Сортировка продуктов
+//Сортировка продуктов
 function sortProducts() {
     const sorted = [...products];
     if (sortField === 'name')
@@ -231,14 +255,14 @@ function sortProducts() {
         sorted.sort((a, b) => sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
 
     } else if (sortField === 'price')
+
     {
         sorted.sort((a, b) => sortOrder === 'asc' ? a.price - b.price : b.price - a.price);
     }
     return sorted;
 }
 
-function renderSortButtons()
-{
+function renderSortButtons() {
     return `
         <div class="sort-bar">
             <button class="sort-btn ${sortField === 'name' && sortOrder === 'asc' ? 'active' : ''}" data-sort="name_asc">Название А→Я</button>
@@ -249,9 +273,11 @@ function renderSortButtons()
     `;
 }
 
-// Корзина
-function addToCart(productId) {
+//Корзина
+function addToCart(productId)
+{
     if (!currentUser || currentUser.role !== 'client')
+
     {
         showToast('Войдите как клиент', true);
         showAuthModal();
@@ -259,16 +285,15 @@ function addToCart(productId) {
     }
     const existing = cart.find(item => item.type === 'product' && item.id === productId);
     if (existing) existing.quantity = (existing.quantity || 1) + 1;
-    else cart.push(
-        {
-            type: 'product', id: productId, quantity: 1
-        });
+    else cart.push({ type: 'product', id: productId, quantity: 1 });
     saveCart();
     updateCartBadge();
     showToast('Товар добавлен в корзину');
 }
-function addRepairToCart(repairId) {
-    if (!currentUser || currentUser.role !== 'client') {
+function addRepairToCart(repairId)
+{
+    if (!currentUser || currentUser.role !== 'client')
+    {
         showToast('Войдите как клиент', true);
         showAuthModal();
         return;
@@ -288,26 +313,31 @@ function removeFromCart(index)
     showToast('Удалено');
 }
 function renderCartModal()
-
 {
     const modalBody = document.getElementById('cartModalBody');
     if (!modalBody) return;
-    if (cart.length === 0) {
+    if (cart.length === 0)
+    {
         modalBody.innerHTML = `<p>Корзина пуста</p><button class="btn-primary" data-bs-dismiss="modal">Закрыть</button>`;
+
         return;
     }
     let total = 0;
     let itemsHtml = `<div class="list-group">`;
-    cart.forEach((item, idx) => {
+    cart.forEach((item, idx) =>
+    {
         let name, price;
-        if (item.type === 'product') {
+        if (item.type === 'product')
+        {
             const prod = products.find(p => p.productId === item.id);
             if (!prod) return;
             name = prod.name;
             price = prod.price;
             total += price * (item.quantity || 1);
             itemsHtml += `<div class="list-group-item d-flex justify-content-between align-items-center">${name} x ${item.quantity || 1} = ${(price * (item.quantity || 1)).toLocaleString()}₽ <button class="btn-sm btn-outline-danger" onclick="removeFromCart(${idx})">Удалить</button></div>`;
-        } else {
+        }
+        else
+        {
             const rep = repairOptions.find(r => r.id === item.id);
             if (!rep) return;
             name = rep.name;
@@ -321,21 +351,26 @@ function renderCartModal()
     modalBody.innerHTML = itemsHtml;
     document.getElementById('checkoutBtn')?.addEventListener('click', () => checkoutOrder());
 }
-async function checkoutOrder() {
+async function checkoutOrder()
+{
     if (!currentUser || currentUser.role !== 'client')
+
     {
         showToast('Войдите как клиент', true);
         return;
     }
+
     if (cart.length === 0) {
         showToast('Корзина пуста');
         return;
     }
-    const items = cart.map(item => (
+    const items = cart.map(item =>(
         {
             type: item.type, id: item.id, quantity: item.quantity || 1
-        } ));
-    try {
+        }
+    ));
+    try
+    {
         await apiFetch('/api/orders/create',
         {
             method: 'POST',
@@ -347,19 +382,19 @@ async function checkoutOrder() {
         const modalEl = document.getElementById('cartModal');
         const modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) modal.hide();
-
         showToast('Заказ оформлен! Менеджер свяжется.');
-
         if (currentUser.role === 'client') renderClientDashboard();
 
-    } catch (err)
+    }
+    catch (err)
     {
         showToast('Ошибка оформления: ' + err.message, true);
     }
 }
 
-//  Отображение каталога / ремонтов / дашбордов 
-function renderClientCatalog() {
+//Отображение каталога + ремонтов + дашбордов (визуализация данных + отследивание)
+function renderClientCatalog()
+{
     const sortedProducts = sortProducts();
     let html = `<h2>Каталог изделий</h2>${renderSortButtons()}<div class="products-grid" id="catalogGrid">`;
     sortedProducts.forEach(p =>
@@ -393,16 +428,19 @@ function renderClientCatalog() {
             if (val === 'name_asc') { sortField = 'name'; sortOrder = 'asc'; }
             else if (val === 'name_desc') { sortField = 'name'; sortOrder = 'desc'; }
             else if (val === 'price_asc') { sortField = 'price'; sortOrder = 'asc'; }
-            else if (val === 'price_desc') { sortField = 'price'; sortOrder = 'desc'; }
+            else if (val === 'price_desc') {
+                sortField = 'price'; sortOrder = 'desc';
+            }
             renderClientCatalog();
         });
     });
     initScrollAnimation();
 }
-
-function showRepairCatalog() {
+function showRepairCatalog()
+{
     let html = `<h2>Услуги ремонта</h2><div class="list-group">`;
-    repairOptions.forEach(r => {
+    repairOptions.forEach(r =>
+    {
         html += `<div class="list-group-item animate-on-scroll">
             <div><strong>${r.name}</strong><br>${r.desc}<br>Цена: ${r.price}₽</div>
             <button class="btn-sm btn-primary mt-2" onclick="addRepairToCart(${r.id})">В корзину</button>
@@ -412,7 +450,8 @@ function showRepairCatalog() {
     dynamicContent.innerHTML = html;
     initScrollAnimation();
 }
-function showProductModal(id) {
+function showProductModal(id)
+{
     const p = products.find(p => p.productId === id);
     if (!p) return;
     const body = document.getElementById('productModalBody');
@@ -428,17 +467,79 @@ function showProductModal(id) {
     new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
-// Дашборды (это панель данных по ролям) 
-async function renderAdminDashboard()
+//Общие функции для таблиц (используются в админке, менеджере)
+function renderOrdersTable(orders) {
+    let html = `<h3>Заказы</h3><div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Действие</th></tr></thead><tbody>`;
+    orders.forEach(o =>
+    {
+        html += `<tr>
+            <td>${o.orderId}</td>
+            <td>${o.client?.fullName || ''}</td>
+            <td><span class="status-badge status-${o.statusOrder?.name}">${o.statusOrder?.name}</span></td>
+            <td>${o.totalCost}₽</td>
+            <td><button class="btn-sm btn-outline" onclick="window.changeOrderStatus(${o.orderId})">Статус</button></td>
+        </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('adminContent') ? document.getElementById('adminContent').innerHTML = html :
+        document.getElementById('managerContent') ? document.getElementById('managerContent').innerHTML = html : null;
+}
+window.changeOrderStatus = async function (orderId)
 {
-    // Получаем данные с API (заказы, пользователи, материалы)
+    let newStatus = prompt('Новый статус (new, in_progress, completed, cancelled)');
+    if (newStatus)
+    {
+        await apiFetch(`/api/orders/${orderId}/status`,
+            {
+                method: 'PUT', body: JSON.stringify({ status: newStatus })
+            });
+        showToast('Статус обновлён');
+        renderApp();
+    }
+};
+function renderProductsTable()
+{
+    let html = `<h3>Товары</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Название</th><th>Цена</th><th>Артикул</th></tr></thead><tbody>`;
+    products.forEach(p =>
+    {
+        html += `<tr><td>${p.name}</td><td>${p.price}₽</td><td>${p.article}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('adminContent').innerHTML = html;
+}
+function renderMaterialsTable(materials)
+{
+    let html = `<h3>Материалы</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>`;
+    materials.forEach(m =>
+    {
+        html += `<tr><td>${m.name}</td><td>${m.quantityInStock} ${m.unit}</td><td>${m.pricePerUnit}₽</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('adminContent').innerHTML = html;
+}
+function renderUsersTable(users)
+{
+    let html = `<h3>Пользователи</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Логин</th><th>Имя</th><th>Роль</th></tr></thead><tbody>`;
+    users.forEach(u => {
+        html += `<tr><td>${u.login}</td><td>${u.fullName}</td><td>${u.roleName}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('adminContent').innerHTML = html;
+}
+
+// Админ-панель
+async function renderAdminDashboard()
+
+{
     let orders = [], users = [], materials = [];
     try
     {
         orders = await apiFetch('/api/orders/all');
         users = await apiFetch('/api/users');
         materials = await apiFetch('/api/materials');
-    } catch (e) {
+    }
+    catch (e)
+    {
         console.warn(e);
     }
     const totalOrders = orders.length;
@@ -453,7 +554,6 @@ async function renderAdminDashboard()
         <button id="adminBackCatalog" class="btn-outline">На сайт</button>
         <div id="adminContent"></div>
     </div>`;
-
     dynamicContent.innerHTML = html;
     document.getElementById('adminOrdersBtn').onclick = () => renderOrdersTable(orders);
     document.getElementById('adminProductsBtn').onclick = () => renderProductsTable();
@@ -462,57 +562,91 @@ async function renderAdminDashboard()
     document.getElementById('adminBackCatalog').onclick = () => renderClientCatalog();
     renderOrdersTable(orders);
 }
-function renderOrdersTable(orders)
-{
-    let html = `<h3>Заказы</h3><div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Действие</th></tr></thead><tbody>`;
-    orders.forEach(o => {
-        html += `<tr><td>${o.orderId}</td><td>${o.client?.fullName || ''}</td><td><span class="status-badge status-${o.statusOrder?.name}">${o.statusOrder?.name}</span></td><td>${o.totalCost}₽</td><td><button class="btn-sm btn-outline" onclick="window.changeOrderStatus(${o.orderId})">Статус</button></td></tr>`;
-    });
-    html += `</tbody></table></div>`;
-    document.getElementById('adminContent').innerHTML = html;
+
+//Панель менеджера
+async function renderManagerDashboard() {
+    let orders = [];
+    try
+    {
+        orders = await apiFetch('/api/orders/all');
+    } catch (e) {
+        console.warn(e);
+        showToast('Ошибка загрузки заказов', true);
+    }
+    let html = `<div class="dashboard"><h2>Панель менеджера</h2>
+        <button id="managerOrdersBtn" class="btn-primary">Заказы</button>
+        <button id="managerBackCatalog" class="btn-outline">На сайт</button>
+        <div id="managerContent"></div>
+    </div>`;
+    dynamicContent.innerHTML = html;
+    document.getElementById('managerOrdersBtn').onclick = () => renderOrdersTable(orders);
+    document.getElementById('managerBackCatalog').onclick = () => renderClientCatalog();
+    renderOrdersTable(orders);
 }
-window.changeOrderStatus = async function (orderId) {
-    let newStatus = prompt('Новый статус (new, in_progress, completed, cancelled)');
-    if (newStatus) {
-        await apiFetch(`/api/orders/${orderId}/status`, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
-        showToast('Статус обновлён');
+
+//Панель ювелира
+async function renderJewelerDashboard()
+{
+    let orders = [];
+    try {
+        orders = await apiFetch('/api/orders/jeweler');
+    } catch (e) {
+        console.warn(e);
+        showToast('Ошибка загрузки заказов', true);
+    }
+    let html = `<div class="dashboard"><h2>Панель ювелира</h2>
+        <div id="jewelerContent"></div>
+        <button class="btn-outline mt-3" onclick="renderClientCatalog()">На сайт</button>
+    </div>`;
+    dynamicContent.innerHTML = html;
+    if (orders.length === 0)
+
+    {
+        document.getElementById('jewelerContent').innerHTML = '<p>Нет заказов</p>';
+        return;
+    }
+    let table = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Действие</th></tr></thead><tbody>`;
+    orders.forEach(o =>
+    {
+        table += `<tr>
+            <td>${o.orderId}</td>
+            <td>${o.client?.fullName || ''}</td>
+            <td><span class="status-badge status-${o.statusOrder?.name}">${o.statusOrder?.name}</span></td>
+            <td>${o.totalCost}₽</td>
+            <td>${o.statusOrder?.name !== 'completed' ? `<button class="btn-sm btn-primary" onclick="window.completeOrder(${o.orderId})">Завершить</button>` : '✓'}</td>
+        </tr>`;
+    });
+    table += `</tbody></table></div>`;
+    document.getElementById('jewelerContent').innerHTML = table;
+}
+window.completeOrder = async function (orderId)
+{
+    try
+    {
+        await apiFetch(`/api/orders/${orderId}/status`,
+        {
+            method: 'PUT',
+            body: JSON.stringify({
+                status: 'completed'
+            })
+        });
+        showToast('Заказ завершён');
         renderApp();
+    } catch (e)
+    {
+        showToast('Ошибка: ' + e.message, true);
     }
 };
-function renderProductsTable() {
-    let html = `<h3>Товары</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Название</th><th>Цена</th><th>Артикул</th></tr></thead><tbody>`;
-    products.forEach(p => {
-        html += `<tr><td>${p.name}</td><td>${p.price}₽</td><td>${p.article}</td></tr>`;
-    });
-    html += `</tbody></table></div>`;
-    document.getElementById('adminContent').innerHTML = html;
-}
-function renderMaterialsTable(materials) {
-    let html = `<h3>Материалы</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>`;
-    materials.forEach(m => {
-        html += `<tr><td>${m.name}</td><td>${m.quantityInStock} ${m.unit}</td><td>${m.pricePerUnit}₽</td></tr>`;
-    });
-    html += `</tbody></table></div>`;
-    document.getElementById('adminContent').innerHTML = html;
-}
-function renderUsersTable(users) {
-    let html = `<h3>Пользователи</h3><div class="table-wrapper"><table class="table"><thead><tr><th>Логин</th><th>Имя</th><th>Роль</th></tr></thead><tbody>`;
-    users.forEach(u => {
-        html += `<tr><td>${u.login}</td><td>${u.fullName}</td><td>${u.roleName}</td></tr>`;
-    });
-    html += `</tbody></table></div>`;
-    document.getElementById('adminContent').innerHTML = html;
-}
-function renderManagerDashboard() { /* аналогично админской, но без управления пользователями */ }
-function renderJewelerDashboard() { /* список заказов ювелира */ }
-function renderClientDashboard() {
-    // показываем последние заказы клиента
+
+// Клиентская панель (просто каталог)
+function renderClientDashboard()
+{
     renderClientCatalog();
 }
 
-// Главный рендер (преобразование кода)
-async function renderApp() {
-    // Если нет текущего пользователя, пытаемся восстановить из sessionStorage
+// Главный рендер
+async function renderApp()
+{
     const saved = sessionStorage.getItem('granat_user');
     if (saved && !currentUser) {
         currentUser = JSON.parse(saved);
@@ -528,8 +662,7 @@ async function renderApp() {
         initScrollAnimation();
         return;
     }
-    switch (currentUser.role)
-    {
+    switch (currentUser.role) {
         case 'admin': await renderAdminDashboard(); break;
         case 'manager': await renderManagerDashboard(); break;
         case 'jeweler': await renderJewelerDashboard(); break;
@@ -538,41 +671,35 @@ async function renderApp() {
     initScrollAnimation();
 }
 
-function initScrollAnimation()
-{
+//Анимация при скролле (используется этот эффект при прокрутке сайта)
+function initScrollAnimation() {
     const animated = document.querySelectorAll('.animate-on-scroll');
     const observer = new IntersectionObserver((entries) =>
     {
         entries.forEach(e =>
         {
             if (e.isIntersecting)
-            {
-                e.target.classList.add('animated'); observer.unobserve(e.target);
-            }
+            { e.target.classList.add('animated'); observer.unobserve(e.target); }
         });
     },
-
         {
             threshold: 0.1
         });
     animated.forEach(el => observer.observe(el));
 }
 
-//  Старт приложения 
-(async function init()
-{
+// Старт самого приложения XD:
+(async function init() {
     await loadProductsFromAPI();
     await loadRepairsFromAPI();
     loadCart();
     updateCartBadge();
     await renderApp();
-    cartBtn.addEventListener('click', () =>
-
-    {
+    cartBtn.addEventListener('click', () => {
         renderCartModal();
         new bootstrap.Modal(document.getElementById('cartModal')).show();
     });
     window.addToCart = addToCart;
     window.addRepairToCart = addRepairToCart;
     window.removeFromCart = removeFromCart;
-}) ();
+})();
