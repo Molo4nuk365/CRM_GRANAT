@@ -1,16 +1,21 @@
-﻿using BCrypt.Net;
+﻿// Подключаем библиотеку BCrypt для безопасного хеширования паролей
+using BCrypt.Net;
+// Подключаем модели данных (User, Role, Order, Product и др.)
 using CRM_Jewelry_workshop.Models;
 
+// Пространство имён для данных (инициализация БД)
 namespace CRM_Jewelry_workshop.Data;
 
+// Статический класс SeedData – содержит метод для заполнения базы начальными данными
 public static class SeedData
 {
+    // Метод Initialize – добавляет записи в БД, если они отсутствуют
     public static void Initialize(AppDbContext db)
     {
-        // Если роли уже есть – не добавляем повторно
+        // Если в таблице Roles уже есть какие-либо записи – выходим (данные уже добавлены)
         if (db.Roles.Any()) return;
 
-        // 1. Роли
+        // Создание ролей
         var roles = new[]
         {
             new Role { RoleName = "admin", Description = "Полный доступ" },
@@ -18,15 +23,19 @@ public static class SeedData
             new Role { RoleName = "jeweler", Description = "Выполнение заказов" },
             new Role { RoleName = "client", Description = "Покупка и заказы" }
         };
+        // Добавляем массив ролей в контекст
         db.Roles.AddRange(roles);
+        // Сохраняем изменения в БД (теперь роли имеют сгенерированные RoleId)
         db.SaveChanges();
 
-        // 2. Пользователи (пароли хешируются BCrypt)
+        // Создание пользователей (пароли хешируются BCrypt)
+        // Получаем созданные роли из БД, чтобы привязать к пользователям
         var adminRole = db.Roles.First(r => r.RoleName == "admin");
         var managerRole = db.Roles.First(r => r.RoleName == "manager");
         var jewelerRole = db.Roles.First(r => r.RoleName == "jeweler");
         var clientRole = db.Roles.First(r => r.RoleName == "client");
 
+        // Массив пользователей с предопределёнными логинами, хешированными паролями и ролями
         var users = new[]
         {
             new User { Login = "admin", PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"), RoleId = adminRole.RoleId, FullName = "Администратор", Email = "admin@example.com", Phone = "" },
@@ -37,7 +46,7 @@ public static class SeedData
         db.Users.AddRange(users);
         db.SaveChanges();
 
-        // 3. Статусы заказов
+        //Статусы заказов (добавляем только если таблица пуста)
         if (!db.StatusOrders.Any())
         {
             db.StatusOrders.AddRange(
@@ -49,7 +58,7 @@ public static class SeedData
             db.SaveChanges();
         }
 
-        // 4. Статусы платежей
+        //Статусы платежей (добавляем только если таблица пуста)
         if (!db.StatusPayments.Any())
         {
             db.StatusPayments.AddRange(
@@ -60,7 +69,7 @@ public static class SeedData
             db.SaveChanges();
         }
 
-        // 5. Товары (изделия)
+        // Товары (изделия) – каталог продукции
         var products = new[]
         {
             new Product { Name = "Кольцо «Гранатовый рассвет»", Price = 18500, Description = "Серебро 925, гранат 0.8 карат", Article = "GR-101", ImageUrl = "/images/кольцо.png" },
@@ -72,15 +81,17 @@ public static class SeedData
         db.Products.AddRange(products);
         db.SaveChanges();
 
-        // 6. Тестовые заказы (3 штуки), чтобы сразу увидеть данные в интерфейсе
+        //Тестовые заказы (3 штуки), чтобы сразу увидеть данные в интерфейсе
         if (!db.Orders.Any())
         {
+            // Находим нужных пользователей и статус
             var client = db.Users.First(u => u.Login == "client");
             var manager = db.Users.First(u => u.Login == "manager");
             var jeweler = db.Users.First(u => u.Login == "jeweler");
             var statusNew = db.StatusOrders.First(s => s.Name == "new");
-            var product = db.Products.First();
+            var product = db.Products.First(); // берём первый товар для суммы
 
+            // Создаём 3 одинаковых заказа (для демонстрации)
             for (int i = 0; i < 3; i++)
             {
                 db.Orders.Add(new Order
