@@ -7,9 +7,10 @@ public static class SeedData
 {
     public static void Initialize(AppDbContext db)
     {
+        // Если роли уже есть – не добавляем повторно
         if (db.Roles.Any()) return;
 
-        // Роли
+        // 1. Роли
         var roles = new[]
         {
             new Role { RoleName = "admin", Description = "Полный доступ" },
@@ -20,7 +21,7 @@ public static class SeedData
         db.Roles.AddRange(roles);
         db.SaveChanges();
 
-        // Пользователи
+        // 2. Пользователи (пароли хешируются BCrypt)
         var adminRole = db.Roles.First(r => r.RoleName == "admin");
         var managerRole = db.Roles.First(r => r.RoleName == "manager");
         var jewelerRole = db.Roles.First(r => r.RoleName == "jeweler");
@@ -36,7 +37,7 @@ public static class SeedData
         db.Users.AddRange(users);
         db.SaveChanges();
 
-        // Статусы заказов
+        // 3. Статусы заказов
         if (!db.StatusOrders.Any())
         {
             db.StatusOrders.AddRange(
@@ -48,7 +49,7 @@ public static class SeedData
             db.SaveChanges();
         }
 
-        // Статусы платежей
+        // 4. Статусы платежей
         if (!db.StatusPayments.Any())
         {
             db.StatusPayments.AddRange(
@@ -59,34 +60,40 @@ public static class SeedData
             db.SaveChanges();
         }
 
-        // Товары
+        // 5. Товары (изделия)
         var products = new[]
         {
             new Product { Name = "Кольцо «Гранатовый рассвет»", Price = 18500, Description = "Серебро 925, гранат 0.8 карат", Article = "GR-101", ImageUrl = "/images/кольцо.png" },
             new Product { Name = "Серьги «Лунный свет»", Price = 12400, Description = "Серебро 925, гранат 0.5 карат", Article = "GR-102", ImageUrl = "/images/серьги.png" },
             new Product { Name = "Подвеска «Капля росы»", Price = 9800, Description = "Серебро 925, гранат 1 карат", Article = "GR-103", ImageUrl = "/images/подвеска.jpg" },
-            new Product { Name = "Браслет «Серебряная нить»", Price = 23500, Description = "Серебро 925, гранат", Article = "GR-104", ImageUrl = "/images/браслет.png" },
+            new Product { Name = "Браслет «Серебряная нить»", Price = 23500, Description = "Серебро 925", Article = "GR-104", ImageUrl = "/images/браслет.png" },
             new Product { Name = "Брошь «Гранат»", Price = 15900, Description = "Серебро 925, гранат 2 карат", Article = "GR-105", ImageUrl = "/images/брошь.jpg" }
         };
         db.Products.AddRange(products);
         db.SaveChanges();
 
-        // Тестовые заказы
+        // 6. Тестовые заказы (3 штуки), чтобы сразу увидеть данные в интерфейсе
         if (!db.Orders.Any())
         {
             var client = db.Users.First(u => u.Login == "client");
             var manager = db.Users.First(u => u.Login == "manager");
             var jeweler = db.Users.First(u => u.Login == "jeweler");
             var statusNew = db.StatusOrders.First(s => s.Name == "new");
-            var productList = db.Products.Take(3).ToList();
+            var product = db.Products.First();
 
-            var ordersList = new List<Order>
+            for (int i = 0; i < 3; i++)
             {
-                new Order { ClientId = client.UserId, ManagerId = manager.UserId, JewelerId = jeweler.UserId, StatusOrderId = statusNew.StatusOrderId, CreateDate = DateTime.Now, TotalCost = productList[0].Price },
-                new Order { ClientId = client.UserId, ManagerId = manager.UserId, JewelerId = jeweler.UserId, StatusOrderId = statusNew.StatusOrderId, CreateDate = DateTime.Now, TotalCost = productList[1].Price },
-                new Order { ClientId = client.UserId, ManagerId = manager.UserId, JewelerId = jeweler.UserId, StatusOrderId = statusNew.StatusOrderId, CreateDate = DateTime.Now, TotalCost = productList[2].Price }
-            };
-            db.Orders.AddRange(ordersList);
+                db.Orders.Add(new Order
+                {
+                    ClientId = client.UserId,
+                    ManagerId = manager.UserId,
+                    JewelerId = jeweler.UserId,
+                    StatusOrderId = statusNew.StatusOrderId,
+                    CreateDate = DateTime.Now,
+                    TotalCost = product.Price,
+                    Deadline = null
+                });
+            }
             db.SaveChanges();
         }
     }

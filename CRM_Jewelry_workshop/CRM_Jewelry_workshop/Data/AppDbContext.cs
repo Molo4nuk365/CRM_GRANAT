@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CRM_Jewelry_workshop.Models;
 
-
 namespace CRM_Jewelry_workshop.Data;
 
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
+    // Таблицы базы данных
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Product> Products => Set<Product>();
@@ -22,10 +22,10 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Уникальный индекс на логин
+        // Уникальный индекс на логин пользователя
         modelBuilder.Entity<User>().HasIndex(u => u.Login).IsUnique();
 
-        // Внешние ключи для Order с каскадным поведением Restrict
+        // Настройка внешних ключей для заказов (запрещаем каскадное удаление)
         modelBuilder.Entity<Order>()
             .HasOne(o => o.Client)
             .WithMany(u => u.OrdersAsClient)

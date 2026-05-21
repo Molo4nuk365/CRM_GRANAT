@@ -6,16 +6,13 @@ using CRM_Jewelry_workshop.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Регистрация сервисов 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "fallback_key_32bytes_!");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -35,17 +32,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
-// Построение приложения
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();          // применяет миграции
-    SeedData.Initialize(db);        // заполняет базу начальными данными
+    db.Database.Migrate();
+    SeedData.Initialize(db);
 }
 
-// Настройка конвейера
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -56,9 +51,8 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers(); // API маршруты
-app.UseDefaultFiles();// index.html
-app.UseStaticFiles();  // статика (css, js, images)
+app.MapControllers();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
-//Запуск 
 app.Run();

@@ -7,6 +7,7 @@ let sortField = 'price';
 let sortOrder = 'asc';
 let isOnMainSite = false;
 
+// DOM элементы
 const profileAvatar = document.getElementById('profileAvatar');
 const cartBtn = document.getElementById('cartBtn');
 const cartCountSpan = document.getElementById('cartCount');
@@ -16,6 +17,7 @@ const heroBlock = document.querySelector('.hero-fullscreen');
 const scrollBtn = document.getElementById('scrollToCatalog');
 const historyBtn = document.getElementById('historyBtn');
 
+// ======================== УТИЛИТЫ ========================
 function showToast(msg, isError = false) {
     toastMsg.textContent = msg;
     toastMsg.style.background = isError ? '#d9534f' : 'var(--accent)';
@@ -26,7 +28,7 @@ function saveCart() { localStorage.setItem('granat_cart', JSON.stringify(cart));
 function loadCart() { const saved = localStorage.getItem('granat_cart'); if (saved) cart = JSON.parse(saved); updateCartBadge(); }
 function updateCartBadge() { const count = cart.reduce((s, i) => s + (i.quantity || 1), 0); cartCountSpan.innerText = count; }
 
-// API (относительные пути – будут работать при открытии через бэкенд)
+// ======================== API ========================
 async function apiFetch(url, options = {}) {
     const headers = { 'Content-Type': 'application/json' };
     if (currentUser?.token) headers['Authorization'] = `Bearer ${currentUser.token}`;
@@ -36,7 +38,7 @@ async function apiFetch(url, options = {}) {
     return res.json();
 }
 
-// Загрузка товаров
+// ======================== ЗАГРУЗКА ДАННЫХ ========================
 async function loadProductsFromAPI() {
     try {
         products = await apiFetch('/api/products');
@@ -46,9 +48,9 @@ async function loadProductsFromAPI() {
         products = [
             { id: 1, productId: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, description: "Серебро 925, гранат 0.8 карат", material: "Серебро 925, гранат", weight: "3.2 г", article: "GR-101", imageUrl: "images/кольцо.png" },
             { id: 2, productId: 2, name: "Серьги «Лунный свет»", price: 12400, description: "Серебро 925, гранат", material: "Серебро 925, гранат", weight: "4.5 г", article: "GR-102", imageUrl: "images/серьги.png" },
-            { id: 3, productId: 3, name: "Подвеска «Капля росы»", price: 9800, description: "Серебро 925, гранат", material: "Серебро 925, гранат", weight: "1.8 г", article: "GR-103", imageUrl: "images/подвеска.jpg" },
+            { id: 3, productId: 3, name: "Подвеска «Капля росы»", price: 9800, description: "Серебро 925, гранат 2 карат", material: "Серебро 925, гранат", weight: "1.8 г", article: "GR-103", imageUrl: "images/подвеска.jpg" },
             { id: 4, productId: 4, name: "Браслет «Серебряная нить»", price: 23500, description: "Серебро 925", material: "Серебро 925", weight: "6.2 г", article: "GR-104", imageUrl: "images/браслет.png" },
-            { id: 5, productId: 5, name: "Брошь «Гранат»", price: 15900, description: "Серебро 925, гранат", material: "Серебро 925, гранат", weight: "5.1 г", article: "GR-105", imageUrl: "images/брошь.jpg" }
+            { id: 5, productId: 5, name: "Брошь «Гранат»", price: 15900, description: "Серебро 925, гранат 2 карат", material: "Серебро 925, гранат", weight: "5.1 г", article: "GR-105", imageUrl: "images/брошь.jpg" }
         ];
     }
 }
@@ -61,7 +63,7 @@ async function loadRepairsFromAPI() {
     ];
 }
 
-// Тёмная тема
+// ======================== ТЁМНАЯ ТЕМА ========================
 const themeToggle = document.getElementById('themeToggle');
 if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
 if (themeToggle) {
@@ -73,7 +75,7 @@ if (themeToggle) {
     });
 }
 
-// Аватар и выход
+// ======================== АВАТАР И ВЫХОД ========================
 function updateProfileAvatar() {
     if (!currentUser) {
         profileAvatar.innerHTML = `<i class="fas fa-user-circle"></i>`;
@@ -108,7 +110,7 @@ function logout() {
     showToast('Вы вышли');
 }
 
-// Авторизация
+// ======================== АВТОРИЗАЦИЯ ========================
 function showAuthModal() {
     const container = document.getElementById('authFormContainer');
     container.innerHTML = `
@@ -182,7 +184,7 @@ function showAuthModal() {
     });
 }
 
-// Корзина
+// ======================== КОРЗИНА ========================
 function modifyCart(type, id, delta) {
     if (!currentUser || currentUser.role !== 'client') { showToast('Войдите как клиент', true); showAuthModal(); return; }
     const idx = cart.findIndex(i => i.type === type && i.id === id);
@@ -243,7 +245,7 @@ async function checkoutOrder() {
     } catch (e) { showToast('Ошибка: ' + e.message, true); }
 }
 
-// История заказов (клиент)
+// ======================== ИСТОРИЯ ЗАКАЗОВ (КЛИЕНТ) ========================
 async function showOrderHistory() {
     if (!currentUser || currentUser.role !== 'client') { showToast('Только для клиентов', true); return; }
     let orders = [];
@@ -258,7 +260,7 @@ async function showOrderHistory() {
         new bootstrap.Modal(document.getElementById('historyModal')).show();
         return;
     }
-    let html = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Тип</th><th>Наименование</th><th>Статус</th><th>Сумма</th><th>Дата</th><th>Срок</th></tr></thead><tbody>`;
+    let html = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Тип</th><th>Наименование</th><th>Статус</th><th>Сумма</th><th>Дата</th><th>Срок</th></td></thead><tbody>`;
     for (let o of orders) {
         let name = '';
         let type = o.type === 'product' ? 'Товар' : 'Ремонт';
@@ -280,18 +282,20 @@ async function showOrderHistory() {
             <td>${deadline}</td>
         </tr>`;
     }
-    html += `</tbody></table></div>`;
+    html += `</tbody></tr></div>`;
     document.getElementById('historyModalBody').innerHTML = html;
     new bootstrap.Modal(document.getElementById('historyModal')).show();
 }
 
-// Сортировка и каталог
+// ======================== СОРТИРОВКА ========================
 function sortProducts() {
     const sorted = [...products];
     if (sortField === 'name') sorted.sort((a, b) => sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
     else sorted.sort((a, b) => sortOrder === 'asc' ? a.price - b.price : b.price - a.price);
     return sorted;
 }
+
+// ======================== КАТАЛОГ (ГЛАВНАЯ) ========================
 function renderClientCatalog() {
     const sorted = sortProducts();
     let html = `<h2 class="catalog-title">✨ Каталог ювелирных украшений</h2>`;
@@ -385,10 +389,10 @@ function showProductModal(id) {
     new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
-// Таблица заказов (общая)
+// ======================== ТАБЛИЦА ЗАКАЗОВ ========================
 async function renderOrdersTable(orders) {
     if (!orders || !orders.length) return '<div class="text-center">Нет заказов</div>';
-    let html = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Срок</th><th>Действие</th><tr></thead><tbody>`;
+    let html = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Срок</th><th>Действие</th></td></thead><tbody>`;
     orders.forEach(o => {
         const clientName = o.client?.fullName || o.clientName || 'Не указан';
         const statusName = o.statusOrder?.name || o.status || 'new';
@@ -444,7 +448,7 @@ window.completeOrder = async function (orderId) {
     renderApp();
 };
 
-// Админ-панель
+// ======================== АДМИН-ПАНЕЛЬ ========================
 async function renderAdminDashboard() {
     let orders = [], users = [], materials = [];
     try { orders = await apiFetch('/api/orders/all'); } catch (e) { console.warn(e); }
@@ -484,7 +488,13 @@ function renderProductsTable() {
         <div class="table-wrapper">
             <table class="table">
                 <thead><tr><th>Название</th><th>Цена</th><th>Артикул</th><th>Материал</th><th>Вес (г)</th></tr></thead>
-                <tbody>${products.map(p => `<tr><td>${p.name}<td>${p.price.toLocaleString()} ₽</td><td>${p.article || '—'}</td><td>${p.material || '—'}</td><td>${p.weight || '—'}</td></tr>`).join('')}</tbody>
+                <tbody>${products.map(p => `<tr>
+                        <td>${p.name}</td>
+                        <td>${p.price.toLocaleString()} ₽</td>
+                        <td>${p.article || '—'}</td>
+                        <td>${p.material || '—'}</td>
+                        <td>${p.weight || '—'}</td>
+                    </tr>`).join('')}</tbody>
             </table>
         </div>`;
     document.getElementById('adminContent').innerHTML = html;
@@ -495,8 +505,14 @@ async function renderUsersTable(users) {
         <div class="table-wrapper">
             <table class="table">
                 <thead><tr><th>ID</th><th>Логин</th><th>Имя</th><th>Роль</th><th>Действие</th></tr></thead>
-                <tbody>${users.map(u => `<tr><td>${u.userId}</td><td>${u.login}</td><td>${u.fullName}</td><td>${u.roleName}</td><td>${u.userId !== currentUser.id ? `<button class="btn-sm btn-outline" onclick="window.deleteUser(${u.userId})">Удалить</button>` : '—'} </tr>`).join('')}</tbody>
-            </table>
+                <tbody>${users.map(u => `<tr>
+                        <td>${u.userId}</td>
+                        <td>${u.login}</td>
+                        <td>${u.fullName}</td>
+                        <td>${u.roleName}</td>
+                        <td>${u.userId !== currentUser.id ? `<button class="btn-sm btn-outline" onclick="window.deleteUser(${u.userId})">Удалить</button>` : '—'}</td>
+                    </tr>`).join('')}</tbody>
+            </tr>
         </div>`;
     document.getElementById('adminContent').innerHTML = html;
     document.getElementById('addUserBtn')?.addEventListener('click', async () => {
@@ -522,15 +538,22 @@ window.deleteUser = async function (id) {
         await apiFetch(`/api/users/${id}`, { method: 'DELETE' });
         showToast('Пользователь удалён');
         renderAdminDashboard();
-    } catch (e) { showToast('Ошибка удаления: ' + e.message, true); }
+    } catch (e) {
+        showToast('Ошибка удаления: ' + e.message, true);
+    }
 };
 async function renderMaterialsTable(materials) {
     let html = `<h3>Материалы</h3>
         <button id="addMaterialBtn" class="btn-primary mb-2">+ Добавить материал</button>
         <div class="table-wrapper">
             <table class="table">
-                <thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th><th>Действие</th></tr></thead>
-                <tbody>${materials.map(m => `<tr><td>${m.name}</td><td>${m.quantityInStock} ${m.unit}</td><td>${m.pricePerUnit}₽</td><td><button class="btn-sm btn-outline" onclick="window.deleteMaterial(${m.materialId})">Удалить</button></td></tr>`).join('')}</tbody>
+                <thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th><th>Действие</th></table></thead>
+                <tbody>${materials.map(m => `<tr>
+                        <td>${m.name}</td>
+                        <td>${m.quantityInStock} ${m.unit}</td>
+                        <td>${m.pricePerUnit}₽</td>
+                        <td><button class="btn-sm btn-outline" onclick="window.deleteMaterial(${m.materialId})">Удалить</button></td>
+                    </tr>`).join('')}</tbody>
             </table>
         </div>`;
     document.getElementById('adminContent').innerHTML = html;
@@ -557,7 +580,7 @@ window.deleteMaterial = async function (id) {
     } catch (e) { showToast('Ошибка: ' + e.message, true); }
 };
 
-// Менеджер-панель
+// ======================== МЕНЕДЖЕР-ПАНЕЛЬ ========================
 async function renderManagerDashboard() {
     let orders = [], materials = [];
     try { orders = await apiFetch('/api/orders/all'); } catch (e) { console.warn(e); }
@@ -576,13 +599,17 @@ async function renderManagerDashboard() {
         document.getElementById('managerContent').innerHTML = await renderOrdersTable(orders);
     };
     document.getElementById('managerMaterialsBtn').onclick = () => {
-        document.getElementById('managerContent').innerHTML = `<div class="table-wrapper"><table class="table"><thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>${materials.map(m => `<tr><td>${m.name}</td><td>${m.quantityInStock} ${m.unit}</td><td>${m.pricePerUnit}₽</td></tr>`).join('')}</tbody></table></div><button class="btn-outline mt-2" onclick="renderManagerDashboard()">← Назад</button>`;
+        document.getElementById('managerContent').innerHTML = `<div class="table-wrapper"><table class="table"><thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>${materials.map(m => `<tr>
+                <td>${m.name}</td>
+                <td>${m.quantityInStock} ${m.unit}</td>
+                <td>${m.pricePerUnit}₽</td>
+            </td>`).join('')}</tbody></table></div><button class="btn-outline mt-2" onclick="renderManagerDashboard()">← Назад</button>`;
     };
     document.getElementById('managerBackCatalog').onclick = () => { isOnMainSite = true; renderClientCatalog(); };
     document.getElementById('managerContent').innerHTML = await renderOrdersTable(orders);
 }
 
-// Ювелир-панель
+// ======================== ЮВЕЛИР-ПАНЕЛЬ ========================
 async function renderJewelerDashboard() {
     let orders = [], materials = [];
     try { orders = await apiFetch('/api/orders/jeweler'); } catch (e) { console.warn(e); }
@@ -599,33 +626,38 @@ async function renderJewelerDashboard() {
     dynamicContent.innerHTML = html;
     const renderOrders = () => {
         if (orders.length === 0) { document.getElementById('jewelerContent').innerHTML = '<p class="text-center">Нет активных заказов</p>'; return; }
-        let table = `<div class="table-wrapper"><table class="table"><thead><td><th>ID</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Срок</th><th>Действие</th></tr></thead><tbody>`;
+        let table = `<div class="table-wrapper"><table class="table"><thead><tr><th>ID</th><th>Клиент</th><th>Статус</th><th>Сумма</th><th>Срок</th><th>Действие</th></tr></thead><tbody>`;
         orders.forEach(o => {
             const deadline = o.deadline ? new Date(o.deadline).toLocaleDateString() : '—';
             table += `<tr>
                 <td>${o.orderId}</td>
                 <td>${o.client?.fullName || ''}</td>
                 <td><span class="status-badge status-${o.statusOrder?.name}">${o.statusOrder?.name}</span></td>
-                <td>${o.totalCost}₽</td><td>${deadline}</td>
+                <td>${o.totalCost}₽</td>
+                <td>${deadline}</td>
                 <td>`;
             if (o.statusOrder?.name !== 'completed') {
                 table += `<button class="btn-sm btn-primary" onclick="window.setDeadline(${o.orderId})">Указать срок</button> `;
                 table += `<button class="btn-sm btn-primary" onclick="window.completeOrder(${o.orderId})">Завершить</button>`;
             } else { table += `✓`; }
-            table += `</tr>`;
+            table += `</div>`;
         });
         table += `</tbody></table></div>`;
         document.getElementById('jewelerContent').innerHTML = table;
     };
     document.getElementById('jewelerOrdersBtn').onclick = renderOrders;
     document.getElementById('jewelerMaterialsBtn').onclick = () => {
-        document.getElementById('jewelerContent').innerHTML = `<div class="table-wrapper"><table class="table"><thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>${materials.map(m => `<tr><td>${m.name}</td><td>${m.quantityInStock} ${m.unit}</td><td>${m.pricePerUnit}₽</td></tr>`).join('')}</tbody></table></div><button class="btn-outline mt-2" onclick="renderJewelerDashboard()">← Назад</button>`;
+        document.getElementById('jewelerContent').innerHTML = `<div class="table-wrapper"><table class="table"><thead><tr><th>Наименование</th><th>Количество</th><th>Цена/ед</th></tr></thead><tbody>${materials.map(m => `<td>
+                <td>${m.name}</td>
+                <td>${m.quantityInStock} ${m.unit}</td>
+                <td>${m.pricePerUnit}₽</td>
+            </tr>`).join('')}</tbody></table></div><button class="btn-outline mt-2" onclick="renderJewelerDashboard()">← Назад</button>`;
     };
     document.getElementById('jewelerBackCatalog').onclick = () => { isOnMainSite = true; renderClientCatalog(); };
     renderOrders();
 }
 
-// Главный рендер
+// ======================== ГЛАВНЫЙ РЕНДЕР ========================
 async function renderApp() {
     const saved = sessionStorage.getItem('granat_user');
     if (saved && !currentUser) {
@@ -649,6 +681,7 @@ async function renderApp() {
     initScrollAnimation();
 }
 
+// ======================== АНИМАЦИЯ ========================
 function initScrollAnimation() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('animated'); observer.unobserve(e.target); } });
@@ -656,7 +689,7 @@ function initScrollAnimation() {
     document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
 }
 
-// Запуск
+// ======================== ЗАПУСК ========================
 (async function () {
     await loadProductsFromAPI();
     await loadRepairsFromAPI();

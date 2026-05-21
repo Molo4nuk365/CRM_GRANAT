@@ -86,7 +86,6 @@ public class OrdersController : BaseController
 
         order.TotalCost = totalCost;
         await _db.SaveChangesAsync();
-
         return Ok(new { message = "Заказ создан", orderId = order.OrderId });
     }
 

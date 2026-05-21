@@ -31,7 +31,8 @@ public class Order
     public DateTime CreateDate { get; set; }
     public decimal TotalCost { get; set; }
 
+    public DateTime? Deadline { get; set; }
+
     public ICollection<Position>? Positions { get; set; }
     public ICollection<Payment>? Payments { get; set; }
-    public DateTime? Deadline { get; set; } // срок изготовления
 }
