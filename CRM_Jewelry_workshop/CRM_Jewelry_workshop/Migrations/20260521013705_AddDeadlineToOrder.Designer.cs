@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CRM_Jewelry_workshop.Data.Migrations
+namespace CRM_Jewelry_workshop.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260520123345_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260521013705_AddDeadlineToOrder")]
+    partial class AddDeadlineToOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,9 @@ namespace CRM_Jewelry_workshop.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Deadline")
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("JewelerId")

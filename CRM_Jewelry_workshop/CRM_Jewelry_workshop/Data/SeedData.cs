@@ -6,13 +6,10 @@ namespace CRM_Jewelry_workshop.Data;
 public static class SeedData
 {
     public static void Initialize(AppDbContext db)
-
     {
-        if (db.Roles.Any())
-            
-            return;
+        if (db.Roles.Any()) return;
 
-        // Добавляем роли
+        // Роли
         var roles = new[]
         {
             new Role { RoleName = "admin", Description = "Полный доступ" },
@@ -23,7 +20,7 @@ public static class SeedData
         db.Roles.AddRange(roles);
         db.SaveChanges();
 
-        //Добавляем пользователей (пароли хешируются BCrypt)
+        // Пользователи
         var adminRole = db.Roles.First(r => r.RoleName == "admin");
         var managerRole = db.Roles.First(r => r.RoleName == "manager");
         var jewelerRole = db.Roles.First(r => r.RoleName == "jeweler");
@@ -39,7 +36,7 @@ public static class SeedData
         db.Users.AddRange(users);
         db.SaveChanges();
 
-        //Добавляем статусы заказов
+        // Статусы заказов
         if (!db.StatusOrders.Any())
         {
             db.StatusOrders.AddRange(
@@ -51,7 +48,7 @@ public static class SeedData
             db.SaveChanges();
         }
 
-        // Добавляем статусы платежей
+        // Статусы платежей
         if (!db.StatusPayments.Any())
         {
             db.StatusPayments.AddRange(
@@ -62,7 +59,7 @@ public static class SeedData
             db.SaveChanges();
         }
 
-        // Добавляем товары
+        // Товары
         var products = new[]
         {
             new Product { Name = "Кольцо «Гранатовый рассвет»", Price = 18500, Description = "Серебро 925, гранат 0.8 карат", Article = "GR-101", ImageUrl = "/images/кольцо.png" },
@@ -73,5 +70,24 @@ public static class SeedData
         };
         db.Products.AddRange(products);
         db.SaveChanges();
+
+        // Тестовые заказы
+        if (!db.Orders.Any())
+        {
+            var client = db.Users.First(u => u.Login == "client");
+            var manager = db.Users.First(u => u.Login == "manager");
+            var jeweler = db.Users.First(u => u.Login == "jeweler");
+            var statusNew = db.StatusOrders.First(s => s.Name == "new");
+            var productList = db.Products.Take(3).ToList();
+
+            var ordersList = new List<Order>
+            {
+                new Order { ClientId = client.UserId, ManagerId = manager.UserId, JewelerId = jeweler.UserId, StatusOrderId = statusNew.StatusOrderId, CreateDate = DateTime.Now, TotalCost = productList[0].Price },
+                new Order { ClientId = client.UserId, ManagerId = manager.UserId, JewelerId = jeweler.UserId, StatusOrderId = statusNew.StatusOrderId, CreateDate = DateTime.Now, TotalCost = productList[1].Price },
+                new Order { ClientId = client.UserId, ManagerId = manager.UserId, JewelerId = jeweler.UserId, StatusOrderId = statusNew.StatusOrderId, CreateDate = DateTime.Now, TotalCost = productList[2].Price }
+            };
+            db.Orders.AddRange(ordersList);
+            db.SaveChanges();
+        }
     }
 }

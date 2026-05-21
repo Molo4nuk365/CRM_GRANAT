@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CRM_Jewelry_workshop.Data.Migrations
+namespace CRM_Jewelry_workshop.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -124,7 +124,8 @@ namespace CRM_Jewelry_workshop.Data.Migrations
                     AdminId = table.Column<int>(type: "int", nullable: true),
                     StatusOrderId = table.Column<int>(type: "int", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Deadline = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Гранат | Ювелирная мастерская — CRM</title>
+    <title>Гранат | Ювелирная мастерская 2026</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="light-theme">
+<body>
     <header>
         <div class="container">
             <div class="d-flex justify-content-between align-items-center py-3">
@@ -19,8 +19,9 @@
                     <span class="text-secondary">|</span>
                     <span class="text-secondary small">Ювелирная мастерская</span>
                 </div>
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-3 align-items-center">
                     <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
+                    <button id="historyBtn" class="icon-btn d-none"><i class="fas fa-clock"></i></button>
                     <div id="profileAvatar" class="profile-avatar"></div>
                     <button id="cartBtn" class="icon-btn cart-icon"><i class="fas fa-shopping-bag"></i><span id="cartCount" class="badge">0</span></button>
                 </div>
@@ -28,28 +29,29 @@
         </div>
     </header>
 
-    <main class="container" id="app">
-        <div class="hero-fullscreen">
-            <div class="hero-overlay"></div>
-            <div class="hero-content text-center text-white">
-                <h1>Гранат</h1>
-                <p>Ювелирная мастерская</p>
-                <button class="btn btn-primary" id="scrollToCatalog">Смотреть коллекцию</button>
-            </div>
+    <div class="hero-fullscreen">
+        <div class="hero-overlay"></div>
+        <div class="hero-content text-center text-white">
+            <h1>Гранат</h1>
+            <p>Ювелирная мастерская</p>
+            <button class="btn btn-primary hero-btn" id="scrollToCatalog">Смотреть коллекцию</button>
         </div>
-        <div id="dynamicContent"></div>
-    </main>
+    </div>
+
+    <main class="container" id="dynamicContent"></main>
 
     <!-- Модальные окна -->
-    <div id="authModal" class="modal fade" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header border-0 justify-content-center"><h5 class="modal-title">Авторизация</h5></div><div class="modal-body" id="authFormContainer"></div></div></div></div>
+    <div id="authModal" class="modal fade" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header border-0 justify-content-center"><h5 class="modal-title">Авторизация</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="authFormContainer"></div></div></div></div>
     <div id="productModal" class="modal fade" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Товар</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="productModalBody"></div></div></div></div>
     <div id="cartModal" class="modal fade" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Корзина</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="cartModalBody"></div></div></div></div>
+    <div id="historyModal" class="modal fade" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content glass-card"><div class="modal-header"><h5 class="modal-title">История заказов</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="historyModalBody"></div></div></div></div>
     <div id="toastMsg" class="toast-msg"></div>
 
     <footer class="footer mt-5 py-3 text-center border-top">
         <div class="container">
             <hr class="w-25 mx-auto">
-            <span><span class="footer-brand">Гранат</span> | Ювелирная мастерская <span class="footer-year">2026</span></span>
+            <div><span class="footer-brand">Гранат | Ювелирная мастерская 2026</span></div>
+            <div class="footer-author">Автор: Филановская Марианна</div>
         </div>
     </footer>
 

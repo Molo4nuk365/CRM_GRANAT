@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
-
 namespace CRM_Jewelry_workshop.Controllers;
 
 [Authorize]
@@ -57,37 +55,39 @@ public class OrdersController : BaseController
         var statusNew = await _db.StatusOrders.FirstOrDefaultAsync(s => s.Name == "new");
         if (statusNew == null) return BadRequest("Статус 'new' не найден");
 
+        var order = new Order
+        {
+            ClientId = clientId,
+            StatusOrderId = statusNew.StatusOrderId,
+            CreateDate = DateTime.Now,
+            TotalCost = 0
+        };
+        _db.Orders.Add(order);
+        await _db.SaveChangesAsync();
+
+        decimal totalCost = 0;
         foreach (var item in dto.Items)
         {
-            var order = new Order
-            {
-                ClientId = clientId,
-                StatusOrderId = statusNew.StatusOrderId,
-                CreateDate = DateTime.Now,
-                TotalCost = 0
-            };
-
             if (item.Type == "product")
             {
                 var product = await _db.Products.FindAsync(item.Id);
                 if (product == null) return BadRequest($"Товар с id {item.Id} не найден");
-                order.TotalCost = product.Price * item.Quantity;
-                // Здесь можно добавить логику списания материалов (Position)
+                totalCost += product.Price * item.Quantity;
             }
             else if (item.Type == "repair")
             {
-                // Для ремонта можно брать фиксированную цену из таблицы RepairOptions,
-                // но сейчас для простоты используем заглушку 3500
-                order.TotalCost = 3500 * item.Quantity;
+                totalCost += 3500 * item.Quantity;
             }
             else
             {
                 return BadRequest("Неверный тип заказа");
             }
-            _db.Orders.Add(order);
         }
+
+        order.TotalCost = totalCost;
         await _db.SaveChangesAsync();
-        return Ok(new { message = "Заказ создан" });
+
+        return Ok(new { message = "Заказ создан", orderId = order.OrderId });
     }
 
     [Authorize(Roles = "admin,manager,jeweler")]
@@ -105,8 +105,46 @@ public class OrdersController : BaseController
         if (newStatus == null) return BadRequest("Неверный статус");
 
         order.StatusOrderId = newStatus.StatusOrderId;
-        if (dto.Status == "completed") order.StatusOrderId = newStatus.StatusOrderId;
         await _db.SaveChangesAsync();
         return Ok(new { message = "Статус обновлён" });
+    }
+
+    [Authorize(Roles = "manager,admin")]
+    [HttpPut("{id}/assignJeweler")]
+    public async Task<IActionResult> AssignJeweler(int id, [FromBody] int jewelerId)
+    {
+        var order = await _db.Orders.FindAsync(id);
+        if (order == null) return NotFound();
+
+        var jeweler = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == jewelerId);
+        if (jeweler == null || jeweler.Role?.RoleName != "jeweler")
+            return BadRequest("Указанный пользователь не является ювелиром");
+
+        order.JewelerId = jewelerId;
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Ювелир назначен" });
+    }
+
+    [Authorize(Roles = "jeweler")]
+    [HttpPut("{id}/setDeadline")]
+    public async Task<IActionResult> SetDeadline(int id, [FromBody] DateTime deadline)
+    {
+        var order = await _db.Orders.FindAsync(id);
+        if (order == null) return NotFound();
+        if (order.JewelerId != CurrentUserId) return Forbid();
+
+        order.Deadline = deadline;
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Срок установлен" });
+    }
+
+    [Authorize(Roles = "client")]
+    [HttpPut("{id}/pay")]
+    public async Task<IActionResult> PayOrder(int id)
+    {
+        var order = await _db.Orders.FindAsync(id);
+        if (order == null) return NotFound();
+        if (order.ClientId != CurrentUserId) return Forbid();
+        return Ok(new { message = "Оплата проведена" });
     }
 }
