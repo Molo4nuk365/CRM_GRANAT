@@ -1,7 +1,3 @@
 <Solution>
-  <Project Path="C:/Users/user/Documents/Visual Studio 18/Database1/Database1.sqlproj" Id="6f2cd98c-e237-411d-b870-a3066c4ee1b4">
-    <Build />
-    <Deploy />
-  </Project>
   <Project Path="CRM_Jewelry_workshop/CRM_Jewelry_workshop.csproj" />
 </Solution>

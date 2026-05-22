@@ -73,37 +73,44 @@ public class OrdersController : BaseController
     [HttpPost("create")]
     public async Task<IActionResult> CreateOrder(CreateOrderDto dto)
     {
-        // ID клиента – текущий авторизованный пользователь
-        var clientId = CurrentUserId;
-        // Находим статус "new" в таблице статусов заказов
+        // Определяем ID клиента в зависимости от роли
+        int clientId;
+        var role = CurrentUserRole;  // из BaseController (из JWT)
+
+        if (role == "admin" || role == "manager")
+        {
+            if (dto.ClientId == null)
+                return BadRequest("Для создания заказа от имени клиента укажите clientId");
+            clientId = dto.ClientId.Value;
+        }
+        else  // роль "client"
+        {
+            clientId = CurrentUserId;
+        }
+
         var statusNew = await _db.StatusOrders.FirstOrDefaultAsync(s => s.Name == "new");
         if (statusNew == null) return BadRequest("Статус 'new' не найден");
 
-        // Создаём объект заказа с начальными значениями
         var order = new Order
         {
-            ClientId = clientId,
+            ClientId = clientId,   // теперь ID клиента правильный
             StatusOrderId = statusNew.StatusOrderId,
             CreateDate = DateTime.Now,
-            TotalCost = 0  // Пока 0, позже пересчитаем
+            TotalCost = 0
         };
-        _db.Orders.Add(order); // Добавляем заказ в контекст
-        await _db.SaveChangesAsync();// Сохраняем, чтобы получить OrderId
+        _db.Orders.Add(order);
+        await _db.SaveChangesAsync();
 
-        decimal totalCost = 0;  // Переменная для подсчёта общей стоимости
-
-        // Обрабатываем каждый элемент (позицию) заказа из DTO
+        decimal totalCost = 0;
         foreach (var item in dto.Items)
         {
-            if (item.Type == "product")   // Если тип – готовое изделие (товар)
+            if (item.Type == "product")
             {
-            // Ищем товар по Id в таблице Products
-               var product = await _db.Products.FindAsync(item.Id);
-              if (product == null) return BadRequest($"Товар с id {item.Id} не найден");
-            // Добавляем стоимость: цена товара * количество
+                var product = await _db.Products.FindAsync(item.Id);
+                if (product == null) return BadRequest($"Товар с id {item.Id} не найден");
                 totalCost += product.Price * item.Quantity;
             }
-            else if (item.Type == "repair") // Если тип – ремонт (фиксированная цена 3500)
+            else if (item.Type == "repair")
             {
                 totalCost += 3500 * item.Quantity;
             }
@@ -113,8 +120,11 @@ public class OrdersController : BaseController
             }
         }
 
-        // Обновляет общую стоимость заказа
-        order.TotalCost = totalCost;
+        
+    
+
+    // Обновляет общую стоимость заказа
+    order.TotalCost = totalCost;
         // Сохраняем изменения (обновление TotalCost)
         await _db.SaveChangesAsync();
 
