@@ -1,53 +1,54 @@
-﻿// Подключаем атрибуты авторизации (Authorize) для ограничения доступа по ролям
-using Microsoft.AspNetCore.Authorization;
-// Подключаем функциональность MVC для создания API-контроллеров (ControllerBase, ApiController и др.)
-using Microsoft.AspNetCore.Mvc;
-// Подключаем Entity Framework Core для асинхронных запросов к БД (Include, Where, ToListAsync и др.)
-using Microsoft.EntityFrameworkCore;
-// Подключаем наш контекст базы данных (AppDbContext) и модели данных
-using CRM_Jewelry_workshop.Data;
+﻿using Microsoft.AspNetCore.Authorization; 
+// Для атрибутов [Authorize], ограничивающих доступ к контроллеру и действиям
+using Microsoft.AspNetCore.Mvc;           
+// Базовые классы и атрибуты для контроллеров Web API
+using Microsoft.EntityFrameworkCore;     
+// Для использования Include, ToListAsync и других методов EF Core
+using CRM_Jewelry_workshop.Data;          
+// Контекст базы данных AppDbContext
 
-// Пространство имён для контроллеров API
 namespace CRM_Jewelry_workshop.Controllers;
 
-// Атрибут Authorize – доступ к этому контроллеру только для пользователей с ролью "admin"
+// Контроллер доступен только администраторам (роль "admin").
+// Использует атрибут [Authorize] на уровне класса, запрещая доступ другим ролям.
 [Authorize(Roles = "admin")]
-// Атрибут ApiController – включает автоматическую валидацию модели, привязку [FromBody] и другие API-фичи
-[ApiController]
-// Базовый маршрут: все методы будут доступны по /api/sales
-[Route("api/[controller]")]
-// Наследуемся от BaseController (вероятно, там определён CurrentUserId и другие общие методы)
-public class SalesController : BaseController
+[ApiController]                      
+// Автоматическая валидация модели и привязка параметров
+[Route("api/[controller]")]          
+// Маршрут: api/Sales
+public class SalesController : BaseController 
+    // Наследует BaseController, где может быть CurrentUserId и т.д.
 {
-// Приватное поле для доступа к базе данных
-    private readonly AppDbContext _db;
+    private readonly AppDbContext _db; 
+    // Контекст базы данных для выполнения запросов
 
-// Конструктор – внедрение зависимости AppDbContext через DI (Dependency Injection)
+    // Внедрение зависимости через конструктор (DI)
     public SalesController(AppDbContext db) => _db = db;
 
- //  Получаем список выполненных заказов (продаж) за период
-    [HttpGet] // Атрибут указывает, что метод обрабатывает HTTP GET запросы
-    // Параметры from и to извлекаются из строки запроса ([FromQuery])
+    // GET api/sales?from=...&to=...
+    // Возвращает список выполненных заказов за указанный период (или без фильтра, если даты не переданы).
+    [HttpGet]
     public async Task<IActionResult> GetSales([FromQuery] DateTime? from, [FromQuery] DateTime? to)
     {
-        // Формируем базовый запрос к таблице Orders с подключением связанной сущности StatusOrder
+        // Формируем запрос к таблице заказов с подгрузкой статуса заказа
         var query = _db.Orders
-            .Include(o => o.StatusOrder)// Подгружаем статус заказа
-            .Where(o => o.StatusOrder!.Name == "completed"); // Фильтруем только выполненные заказы (продажи)
+            .Include(o => o.StatusOrder)// Жадная загрузка статуса, чтобы проверить его название
+            .Where(o => o.StatusOrder!.Name == "Выполнен"); 
+        // Отбираем только заказы со статусом "Выполнен"
+        // "!" — утверждение, что StatusOrder не null (мы уверены после Include)
 
-        // Если параметр from передан (имеет значение), добавляем условие: дата создания >= from
+        // Если передан параметр from, добавляем фильтр по дате создания заказа "с"
         if (from.HasValue) query = query.Where(o => o.CreateDate >= from);
-
-        // Если параметр to передан, добавляем условие: дата создания <= to
+        // Если передан параметр to, добавляем фильтр по дате создания заказа "до"
         if (to.HasValue) query = query.Where(o => o.CreateDate <= to);
 
-        // Выполняем запрос асинхронно и получаем список заказов
+        // Выполняем запрос к БД и получаем список заказов
         var orders = await query.ToListAsync();
 
-        // Вычисляем общую сумму всех найденных заказов (суммируем TotalCost)
+        // Считаем общую сумму всех отфильтрованных заказов
         var total = orders.Sum(o => o.TotalCost);
 
-        // Возвращаем HTTP 200 OK с объектом, содержащим список заказов и общую сумму
+        // Возвращаем HTTP 200 OK с объектом, содержащим список заказов и итоговую сумму
         return Ok(new { orders, total });
     }
 }

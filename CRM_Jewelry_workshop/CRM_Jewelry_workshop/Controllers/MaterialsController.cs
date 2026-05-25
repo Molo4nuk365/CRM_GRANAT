@@ -1,95 +1,100 @@
-﻿// Подключаем контекст базы данных (AppDbContext) для работы с данными
-using CRM_Jewelry_workshop.Data;
-// Подключаем модели данных (Material – материал, используемый в производстве)
-using CRM_Jewelry_workshop.Models;
-// Подключаем атрибуты авторизации (Authorize) для ограничения доступа по ролям
-using Microsoft.AspNetCore.Authorization;
-// Подключаем функциональность MVC для создания API-контроллеров
-using Microsoft.AspNetCore.Mvc;
-// Подключаем Entity Framework Core для асинхронных запросов к БД
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization; 
+// Атрибуты [Authorize] для ограничения доступа к контроллеру/методам на основе ролей
+using Microsoft.AspNetCore.Mvc;           
+// Базовые классы и атрибуты для Web API (ApiController, Route, HttpGet и др.)
+using Microsoft.EntityFrameworkCore;     
+// Методы расширения EF Core (ToListAsync, FindAsync) для асинхронных запросов
+using CRM_Jewelry_workshop.Data;          
+// Контекст базы данных AppDbContext — точка входа ко всем таблицам
+using CRM_Jewelry_workshop.Models;        
+// Модели сущностей (Material, Product, Order и т.д.)
 
-// Пространство имён для контроллеров API
 namespace CRM_Jewelry_workshop.Controllers;
 
-// Атрибут Authorize – доступ к контроллеру только для пользователей с ролями: admin, manager, jeweler
+// Контроллер для управления справочником материалов.
+// На уровне класса задано [Authorize(Roles = "admin,manager,jeweler")], поэтому все методы,
+// если не переопределено, доступны только этим трём ролям.
 [Authorize(Roles = "admin,manager,jeweler")]
-// Атрибут ApiController – включает автоматическую валидацию модели, привязку [FromBody] и другие API-фичи
-[ApiController]
-// Базовый маршрут: все методы будут доступны по /api/materials
-[Route("api/[controller]")]
-// Наследуемся от BaseController (предположительно, там определены CurrentUserId, CurrentUserRole и общие методы)
-public class MaterialsController : BaseController
+[ApiController]                      
+// Автоматическая проверка модели и привязка параметров
+[Route("api/[controller]")]          
+// Маршрут: api/Materials
+public class MaterialsController : BaseController 
+// Наследуем BaseController, получая CurrentUserId, CurrentUserRole и т.д.
 {
-    // Приватное поле для доступа к базе данных
-    private readonly AppDbContext _db;
+    private readonly AppDbContext _db; 
+    
+// Контекст БД, внедряемый через конструктор
 
-    // Конструктор – внедрение зависимости AppDbContext через DI (Dependency Injection)
+    // Конструктор с DI
     public MaterialsController(AppDbContext db) => _db = db;
 
-    // GET: /api/materials – получить список всех материалов (доступно admin, manager, jeweler)
-    [HttpGet]   // Атрибут указывает, что метод обрабатывает HTTP GET запросы
-    public async Task<IActionResult> GetAll()
-    {
-        // Запрашиваем все материалы из таблицы Materials асинхронно
-        var materials = await _db.Materials.ToListAsync();
-        // Возвращаем HTTP 200 OK с JSON-массивом материалов
-        return Ok(materials);
-    }
+    // GET api/materials — получить список всех материалов.
+    // Доступен трём ролям согласно атрибуту класса.
+    [HttpGet]
+    public async Task<IActionResult> GetAll() =>
+    // Возвращаем 200 OK с массивом материалов, загруженных из БД асинхронно
+        Ok(await _db.Materials.ToListAsync());
 
-    // POST: /api/materials – создать новый материал (только для администраторов)
-    [Authorize(Roles = "admin")]// Переопределяем доступ – только роль admin
-    [HttpPost]// Атрибут для обработки HTTP POST запросов
+    // POST api/materials — создать новый материал.
+    // Переопределяем ограничение: доступно только администратору.
+    [Authorize(Roles = "admin")]
+    [HttpPost]
     public async Task<IActionResult> Create([FromBody] Material material)
     {
-        // Проверяем, что название материала не пустое и не состоит из пробелов
-        if (string.IsNullOrWhiteSpace(material.Name))
-            return BadRequest("Название обязательно");// 400 Bad Request с сообщением
+        // Простейшая валидация: название материала не должно быть пустым или состоять из пробелов
+        if (string.IsNullOrWhiteSpace(material.Name)) return BadRequest("Название обязательно");
 
-        // Добавляем новый материал в контекст (в состояние Added)
+        // Добавляем материал в контекст (пока в памяти)
         _db.Materials.Add(material);
-        // Сохраняем изменения в базе данных (вставка новой записи)
+        // Сохраняем изменения в БД, после чего material получит MaterialId
         await _db.SaveChangesAsync();
-        // Возвращаем 200 OK с созданным материалом (включая сгенерированный MaterialId)
+        // Возвращаем созданный материал
         return Ok(material);
     }
 
-    // PUT: /api/materials/{id} – обновить существующий материал (только для администраторов)
-    [Authorize(Roles = "admin")]// Только админ
-    [HttpPut("{id}")] // {id} – параметр маршрута, указывает какой материал обновить
+    // PUT api/materials/{id} — обновить существующий материал.
+    // Только администратор.
+    [Authorize(Roles = "admin")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] Material material)
     {
-        // Ищем существующий материал по первичному ключу
+        // Находим существующий материал по ID
         var existing = await _db.Materials.FindAsync(id);
-        if (existing == null) return NotFound(); // Если не найден – 404
+        // Если не найден — 404
+        if (existing == null) return NotFound();
 
-        // Обновляем все поля существующего материала значениями из переданного объекта
-        existing.Name = material.Name;// Название материала
-        existing.Unit = material.Unit;   // Единица измерения (г, кар, шт)
-        existing.PricePerUnit = material.PricePerUnit;// Цена за единицу
-        existing.QuantityInStock = material.QuantityInStock; // Количество на складе
-        existing.Description = material.Description; // Описание
+        // Поштучно обновляем все редактируемые поля
+        existing.Name = material.Name;
+        existing.Unit = material.Unit;
+        existing.PricePerUnit = material.PricePerUnit;
+        existing.QuantityInStock = material.QuantityInStock;
+        existing.Description = material.Description;
 
-        // Сохраняем изменения в базе данных (UPDATE)
+        // Сохраняем изменения в БД
         await _db.SaveChangesAsync();
-        // Возвращаем 200 OK с обновлённым объектом материала
+        // Возвращаем обновлённый объект
         return Ok(existing);
     }
 
-    // DELETE: /api/materials/{id} – удалить материал (только для администраторов)
-    [Authorize(Roles = "admin")]   // Только админ
+    // DELETE api/materials/{id} — удалить материал.
+    // Только администратор.
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         // Ищем материал по первичному ключу
         var material = await _db.Materials.FindAsync(id);
-        if (material == null) return NotFound(); // Если не найден – 404
+        // Если не существует — возвращаем 404
+        if (material == null) return NotFound();
 
-        // Удаляем материал из контекста (состояние Deleted)
+        // Удаляем объект из контекста
         _db.Materials.Remove(material);
-        // Сохраняем изменения в базе данных (DELETE)
+        // Применяем удаление в базе данных
         await _db.SaveChangesAsync();
-        // Возвращаем 200 OK (без тела, или можно Ok(new { message = "Материал удалён" }))
+
+        // Возвращаем 200 OK без содержимого
+        // (можно было бы вернуть NoContent() для 204)
         return Ok();
     }
 }

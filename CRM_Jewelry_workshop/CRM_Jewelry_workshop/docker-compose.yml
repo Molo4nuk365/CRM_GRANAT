@@ -1,33 +1,23 @@
-version: '3.8'
-
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: jewelry_sql
-    environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: ${SA_PASSWORD}
-      MSSQL_PID: "Express"
-    ports:
-      - "1433:1433"
-    volumes:
-      - sql_data:/var/opt/mssql
-    restart: unless-stopped
-
   api:
-    build: .
-    container_name: jewelry_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jewelry_api_sqlite
     ports:
       - "8080:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CRM_Jewelry_workshop;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=true;MultipleActiveResultSets=true;
-      - Jwt__Key=${JWT_KEY}
+      - ASPNETCORE_ENVIRONMENT=Production
+      # Подключение к SQLite (имя CRM_Jewelry_workshop)
+      - ConnectionStrings__CRM_Jewelry_workshop=Data Source=/app/Data/SQLiteDatabase.db
+      - Jwt__Key=${JWT_KEY:-supersecretkeywithatleast32characterslong!}
       - Jwt__Issuer=JewelryCRM
       - Jwt__Audience=JewelryClient
-    depends_on:
-      - sqlserver
+    volumes:
+      # Том для хранения файла SQLite
+      - sqlite_data:/app/Data
     restart: unless-stopped
 
 volumes:
-  sql_data:
+  sqlite_data:
+    driver: local

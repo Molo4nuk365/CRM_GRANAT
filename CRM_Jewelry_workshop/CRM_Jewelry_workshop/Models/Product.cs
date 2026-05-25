@@ -1,41 +1,47 @@
 ﻿// Подключаем системные пространства имён (для базовых типов, атрибутов валидации и работы с БД)
 using System;
-using System.ComponentModel.DataAnnotations.Schema;   // Для атрибутов, связанных с отображением в БД (например, ForeignKey, Column)
-using System.ComponentModel.DataAnnotations;        // Для атрибутов валидации и первичного ключа [Key]
+using System.ComponentModel.DataAnnotations.Schema;   
+// Для атрибутов, связанных с отображением в БД (например, ForeignKey, Column)
+using System.ComponentModel.DataAnnotations;        
+// Для атрибутов валидации и первичного ключа [Key]
 
 // Объявляем пространство имён, где находятся модели приложения
 namespace CRM_Jewelry_workshop.Models
 {
-    // Класс Product представляет товар (ювелирное изделие) в каталоге
+    // Товар – ювелирное изделие
     public class Product
     {
-        // Первичный ключ – уникальный идентификатор товара
-        [Key] // Атрибут указывает, что свойство является первичным ключом в таблице Products
+        [Key]
         public int ProductId { get; set; }
 
-        // Название изделия (например, "Кольцо «Гранатовый рассвет»")
-        public string Name { get; set; } = string.Empty;   // Инициализация пустой строкой (non-nullable)
+        // Наименование изделия (например, "Кольцо «Гранатовый рассвет»")
+        public string Name { get; set; } = string.Empty;
 
-        // Тип изделия (кольцо, серьги, подвеска, браслет, брошь)
+        // Тип: кольцо, серьги, подвеска, браслет, брошь
         public string Type { get; set; } = string.Empty;
 
-        // Полное описание товара (материал, вставки, размер, особенности)
+        // Полное описание (материал, особенности, страна производства)
         public string Description { get; set; } = string.Empty;
 
-        // Вес изделия в граммах (тип decimal для точности)
+        // Вес в граммах (грамовка)
         public decimal Weight { get; set; }
 
-        // Цена товара в рублях или другой валюте
+        // Металл, из которого изготовлено изделие (например, "Серебро 925")
+        public string Metal { get; set; } = "Серебро 925";
+
+        // Камень-вставка (например, "Гранат")
+        public string Stone { get; set; } = "Гранат";
+
+        // Цена в рублях
         public decimal Price { get; set; }
 
-        // Статус наличия на складе (available – в наличии, out_of_stock – нет в наличии)
-        // Значение по умолчанию "available"
+        // Статус наличия: available / out_of_stock
         public string Status { get; set; } = "available";
 
-        // URL (путь) к изображению товара (которое есть на сайте)
+        // URL изображения товара (относительный путь внутри wwwroot)
         public string ImageUrl { get; set; } = string.Empty;
 
-        // Артикул товара – уникальный код для идентификации в учётной системе
+        // Артикул – уникальный код товара
         public string Article { get; set; } = string.Empty;
     }
 }

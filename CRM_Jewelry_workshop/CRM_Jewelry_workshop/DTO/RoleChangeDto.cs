@@ -6,6 +6,6 @@ namespace CRM_Jewelry_workshop.DTO
     {
         // Свойство Role – название новой роли (например, "admin", "manager", "jeweler", "client")
         // Будет передаваться в теле запроса (JSON)
-        public string Role { get; set; }
+        public string Role { get; set; } = string.Empty;
     }
 }

@@ -1,8 +1,20 @@
 {
   "dependencies": {
+    "mssql2": {
+      "restored": true,
+      "restoreTime": "2026-05-22T17:34:19.0487059Z"
+    },
+    "mssql1": {
+      "restored": true,
+      "restoreTime": "2026-05-23T10:38:06.1372478Z"
+    },
     "secrets1": {
       "restored": true,
       "restoreTime": "2026-05-21T03:01:33.0276416Z"
+    },
+    "sqlite1": {
+      "restored": true,
+      "restoreTime": "2026-05-23T10:35:37.6847791Z"
     }
   },
   "parameters": {}

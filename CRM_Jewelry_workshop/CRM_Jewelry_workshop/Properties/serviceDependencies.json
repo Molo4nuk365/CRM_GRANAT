@@ -1,7 +1,12 @@
 {
   "dependencies": {
-    "secrets1": {
-      "type": "secrets"
+    "identityapp1": {
+      "ignored": "true",
+      "type": "identityapp"
+    },
+    "sqlite1": {
+      "type": "sqlite",
+      "connectionId": "CRM_Jewelry_workshop"
     }
   }
 }

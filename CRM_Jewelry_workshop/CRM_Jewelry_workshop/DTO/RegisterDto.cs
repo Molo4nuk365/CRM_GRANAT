@@ -1,5 +1,5 @@
 ﻿// Пространство имён для DTO (Data Transfer Objects) – объекты для передачи данных между клиентом и сервером
-namespace CRM_Jewelry_workshop.DTOs;
+namespace CRM_Jewelry_workshop.DTO;
 
 // DTO для регистрации нового пользователя (используется в AuthController.Register)
 public class RegisterDto

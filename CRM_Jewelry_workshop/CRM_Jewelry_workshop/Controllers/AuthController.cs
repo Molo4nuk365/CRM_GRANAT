@@ -1,110 +1,117 @@
-﻿// Подключаем BCrypt для хеширования паролей
-using BCrypt.Net;
-// Подключаем контекст БД, DTO и модели
-using CRM_Jewelry_workshop.Data;
-using CRM_Jewelry_workshop.DTOs;
-using CRM_Jewelry_workshop.Models;
-// Подключаем авторизацию и MVC
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-// Подключаем EF Core для асинхронных запросов
-using Microsoft.EntityFrameworkCore;
-// Подключаем криптографию для JWT
-using Microsoft.IdentityModel.Tokens;
-// Подключаем создание JWT-токенов
-using System.IdentityModel.Tokens.Jwt;
-// Подключаем Claims (утверждения)
-using System.Security.Claims;
-// Подключаем кодировку строк
-using System.Text;
+﻿using BCrypt.Net;                      
+// Библиотека BCrypt для хеширования и проверки паролей (методы HashPassword, Verify)
+using CRM_Jewelry_workshop.Data;       
+// Контекст базы данных (AppDbContext)
+using CRM_Jewelry_workshop.DTO;        
+// DTO-классы (RegisterDto, LoginDto) для передачи данных аутентификации
+using CRM_Jewelry_workshop.Models;     
+// Модели сущностей, в том числе User и Role
+using Microsoft.AspNetCore.Authorization; 
+// Атрибут [Authorize] для защиты методов
+using Microsoft.AspNetCore.Mvc;          
+// Базовые классы для контроллеров (ApiController, Route, IActionResult и др.)
+using Microsoft.EntityFrameworkCore;     
+// Методы расширения EF Core: Include, FirstOrDefaultAsync, AnyAsync
+using Microsoft.IdentityModel.Tokens;    
+// Классы для работы с токенами: SymmetricSecurityKey, SigningCredentials
+using System.IdentityModel.Tokens.Jwt;   
+// Создание и запись JWT-токенов (JwtSecurityToken, JwtSecurityTokenHandler)
+using System.Security.Claims;            
+// Утверждения (claims) для токена: ClaimTypes.NameIdentifier, ClaimTypes.Role
+using System.Text;                       
+// Кодировка строки в байты для ключа безопасности (Encoding.UTF8)
 
-// Пространство имён для контроллеров
 namespace CRM_Jewelry_workshop.Controllers;
 
-// Контроллер аутентификации (регистрация, логин, получение текущего пользователя)
-// Наследуется от BaseController (чтобы использовать CurrentUserId)
-public class AuthController : BaseController
+// Контроллер аутентификации — регистрация, вход, получение информации о текущем пользователе.
+[ApiController]                    
+// Автоматическая валидация модели и привязка параметров из тела запроса
+[Route("api/[controller]")]        
+// Базовый маршрут: api/Auth
+public class AuthController : BaseController  
+    // Наследует свойства CurrentUserId, CurrentUserRole
 {
-    // Поле для работы с БД
-    private readonly AppDbContext _db;
-    // Поле для доступа к конфигурации (Jwt:Key, Issuer, Audience)
-    private readonly IConfiguration _config;
+    private readonly AppDbContext _db;          
+    // Контекст базы данных для работы с пользователями и ролями
+    private readonly IConfiguration _config;    
+    // Доступ к настройкам приложения (appsettings.json), в том числе к JWT-секции
 
-    // Конструктор – внедрение зависимостей
-    public AuthController(AppDbContext db, IConfiguration config)
-    {
-        _db = db;
-        _config = config;
-    }
+    // Конструктор с внедрением зависимостей (DbContext и IConfiguration)
+    // Используется кортежное присваивание для лаконичности
+    public AuthController(AppDbContext db, IConfiguration config) => (_db, _config) = (db, config);
 
-    // POST: /api/auth/register – регистрация нового пользователя (роль client)
+    // POST api/auth/register — регистрация нового пользователя.
+    // Доступен без аутентификации (нет [Authorize]).
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
-        // Проверяем, не занят ли логин
+        // Проверяем уникальность логина: если такой уже существует, возвращаем ошибку
         if (await _db.Users.AnyAsync(u => u.Login == dto.Login))
             return BadRequest(new { message = "Логин уже занят" });
 
-        // Ищем роль "client" в БД (должна быть создана SeedData)
+        // Находим роль "client", которую получает каждый новый зарегистрированный пользователь
         var clientRole = await _db.Roles.FirstOrDefaultAsync(r => r.RoleName == "client");
-        if (clientRole == null)
-            return BadRequest(new { message = "Роль 'client' не найдена. Выполните SeedData." });
+        if (clientRole == null) return BadRequest("Роль 'client' не найдена");
 
-        // Создаём нового пользователя
+        // Создаём объект User на основе данных из DTO
         var user = new User
         {
             Login = dto.Login,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password), // Хешируем пароль
+            // Хешируем пароль с помощью BCrypt перед сохранением (никогда не храним пароли в открытом виде)
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
             FullName = dto.FullName,
             Email = dto.Email,
             Phone = dto.Phone,
-            RoleId = clientRole.RoleId
+            RoleId = clientRole.RoleId   
+            // Присваиваем роль "client"
         };
 
+        // Добавляем нового пользователя в контекст
         _db.Users.Add(user);
+        // Сохраняем изменения в базе данных (после этого user получит UserId)
         await _db.SaveChangesAsync();
+
+        // Возвращаем сообщение об успешной регистрации
         return Ok(new { message = "Регистрация успешна" });
     }
 
-    // POST: /api/auth/login – вход и выдача JWT-токена
+    // POST api/auth/login — вход в систему, получение JWT-токена.
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
-        // Ищем пользователя по логину, включая его роль
-        var user = await _db.Users
-            .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.Login == dto.Login);
+     // Ищем пользователя по логину и сразу подгружаем его роль (понадобится для токена)
+        var user = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Login == dto.Login);
 
-        // Если пользователь не найден или пароль неверен – 401 Unauthorized
-        if (user == null
-            || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+     // Если пользователь не найден или пароль не совпадает — возвращает 401 Unauthorized
+     // BCrypt.Verify сравнивает переданный пароль с сохранённым хешем
+        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
             return Unauthorized(new { message = "Неверный логин или пароль" });
 
-        // Генерируем JWT-токен
+     // Генерируем JWT-токен для успешно аутентифицированного пользователя
         var token = GenerateJwtToken(user);
-        // Возвращаем данные пользователя и токен
+
+     // Возвращаем данные пользователя и токен
         return Ok(new
         {
             userId = user.UserId,
             fullName = user.FullName,
-            roleName = user.Role?.RoleName ?? "client",
-            token = token
+            roleName = user.Role?.RoleName ?? "client", // Если роль не загружена, подставляем "client"
+            token
         });
     }
 
-    // GET: /api/auth/me – получить данные текущего авторизованного пользователя
-    [Authorize] // Требует валидный JWT-токен
+    // GET api/auth/me — получает информацию о текущем авторизованном пользователе.
+    // Требуется аутентификация ([Authorize] без указания ролей — любой авторизованный пользователь).
+    [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> GetCurrentUser()
     {
-        // CurrentUserId – из BaseController (извлекается из токена)
-        var user = await _db.Users
-            .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.UserId == CurrentUserId);
-        if (user == null) return NotFound();
+   // Находим пользователя по его ID, полученному из JWT-токена (через CurrentUserId базового контроллера)
+        var user = await _db.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == CurrentUserId);
+        if (user == null) return NotFound(); // Если вдруг пользователь не найден — 404
 
-        // Возвращаем информацию о пользователе (без пароля)
-        return Ok(new
+  // Возвращаем основную информацию о пользователе, включая роль
+        return Ok (new
         {
             user.UserId,
             user.Login,
@@ -115,35 +122,40 @@ public class AuthController : BaseController
         });
     }
 
-    // Приватный метод: генерация JWT-токена
+    // Приватный метод генерации JWT-токена.
+    // Принимает объект User и возвращает подписанный JWT в виде строки.
     private string GenerateJwtToken(User user)
     {
-        // Создаём ключ подписи из строки из конфигурации
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-        // Создаём учётные данные для подписи (алгоритм HMAC-SHA256)
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        // Формируем утверждения (claims): ID пользователя, роль, логин
+        // Создаём ключ безопасности на основе секретного ключа из конфигурации (appsettings.json, секция "Jwt:Key")
+   var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+        // Указываем алгоритм подписи — HMAC-SHA256
+   var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+     // Формируем набор утверждений (claims), которые будут встроены в токен:
         var claims = new[]
         {
+            // Уникальный идентификатор пользователя (для BaseController.CurrentUserId)
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            // Роль пользователя (для авторизации на основе ролей)
             new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "client"),
+            // Имя пользователя (логин) — дополнительная информация
             new Claim(ClaimTypes.Name, user.Login)
         };
-        // Создаём JWT-токен с указанными параметрами
-        var token = new JwtSecurityToken(
-            // Издатель токена (iss) – берётся из конфигурации (appsettings.json)
-            issuer: _config["Jwt:Issuer"],
-            // Аудитория (aud) – для кого предназначен токен, из конфигурации
-            audience: _config["Jwt:Audience"],
-            // Утверждения (claims) – данные о пользователе (ID, роль, логин)
-            claims: claims,
-            // Срок действия токена – истекает через 7 дней с текущего момента
-            expires: DateTime.Now.AddDays(7),
-            // Учётные данные для подписи (секретный ключ + алгоритм HMAC-SHA256)
-            signingCredentials: creds);
 
-        // Преобразуем объект JwtSecurityToken в строку (стандартный JWT формат)
-        // JwtSecurityTokenHandler умеет сериализовать токен в Base64Url-кодированные части
+        // Создаём объект JwtSecurityToken со всеми параметрами:
+        var token = new JwtSecurityToken(
+            issuer: _config["Jwt:Issuer"],           
+            // Кто выпустил токен
+            audience: _config["Jwt:Audience"],        
+            // Для кого предназначен токен
+            claims: claims,                           
+            // Утверждения
+            expires: DateTime.Now.AddDays(30),         
+            // Срок действия — 30 дней
+            signingCredentials: creds);               
+            // Ключ и алгоритм подписи
+
+        // Сериализуем токен в строку и возвращаем его
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

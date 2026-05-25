@@ -1,21 +1,14 @@
-﻿// Подключаем библиотеку BCrypt для безопасного хеширования паролей
-using BCrypt.Net;
-// Подключаем модели данных (User, Role, Order, Product и др.)
+﻿using BCrypt.Net;
+using CRM_Jewelry_workshop.Data;
 using CRM_Jewelry_workshop.Models;
 
-// Пространство имён для данных (инициализация БД)
-namespace CRM_Jewelry_workshop.Data;
-
-// Статический класс SeedData – содержит метод для заполнения базы начальными данными
 public static class SeedData
 {
-    // Метод Initialize – добавляет записи в БД, если они отсутствуют
     public static void Initialize(AppDbContext db)
     {
-        // Если в таблице Roles уже есть какие-либо записи – выходим (данные уже добавлены)
         if (db.Roles.Any()) return;
 
-        // Создание ролей
+        // Роли
         var roles = new[]
         {
             new Role { RoleName = "admin", Description = "Полный доступ" },
@@ -23,42 +16,39 @@ public static class SeedData
             new Role { RoleName = "jeweler", Description = "Выполнение заказов" },
             new Role { RoleName = "client", Description = "Покупка и заказы" }
         };
-        // Добавляем массив ролей в контекст
         db.Roles.AddRange(roles);
-        // Сохраняем изменения в БД (теперь роли имеют сгенерированные RoleId)
         db.SaveChanges();
 
-        // Создание пользователей (пароли хешируются BCrypt)
-        // Получаем созданные роли из БД, чтобы привязать к пользователям
         var adminRole = db.Roles.First(r => r.RoleName == "admin");
         var managerRole = db.Roles.First(r => r.RoleName == "manager");
         var jewelerRole = db.Roles.First(r => r.RoleName == "jeweler");
         var clientRole = db.Roles.First(r => r.RoleName == "client");
 
-        // Массив пользователей с предопределёнными логинами, хешированными паролями и ролями
         var users = new[]
         {
-            new User { Login = "admin", PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"), RoleId = adminRole.RoleId, FullName = "Администратор", Email = "admin@example.com", Phone = "" },
+            new User { Login = "admin",   PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),   RoleId = adminRole.RoleId, FullName = "Администратор", Email = "admin@example.com", Phone = "" },
             new User { Login = "manager", PasswordHash = BCrypt.Net.BCrypt.HashPassword("manager123"), RoleId = managerRole.RoleId, FullName = "Менеджер", Email = "manager@example.com", Phone = "" },
             new User { Login = "jeweler", PasswordHash = BCrypt.Net.BCrypt.HashPassword("jeweler123"), RoleId = jewelerRole.RoleId, FullName = "Ювелир", Email = "jeweler@example.com", Phone = "" },
-            new User { Login = "client", PasswordHash = BCrypt.Net.BCrypt.HashPassword("client123"), RoleId = clientRole.RoleId, FullName = "Клиент", Email = "client@example.com", Phone = "+7(999)111-22-33" }
+            new User { Login = "client",  PasswordHash = BCrypt.Net.BCrypt.HashPassword("client123"),  RoleId = clientRole.RoleId, FullName = "Клиент", Email = "client@example.com", Phone = "+7(999)111-22-33" }
         };
         db.Users.AddRange(users);
         db.SaveChanges();
 
-        //Статусы заказов (добавляем только если таблица пуста)
+        // Статусы заказов
         if (!db.StatusOrders.Any())
         {
             db.StatusOrders.AddRange(
-                new StatusOrder { Name = "new" },
-                new StatusOrder { Name = "in_progress" },
-                new StatusOrder { Name = "completed" },
-                new StatusOrder { Name = "cancelled" }
+                new StatusOrder { Name = "Новый" },
+                new StatusOrder { Name = "Принят" },
+                new StatusOrder { Name = "В работе" },
+                new StatusOrder { Name = "Готов" },
+                new StatusOrder { Name = "Завершён" },
+                new StatusOrder { Name = "Отменён" }
             );
             db.SaveChanges();
         }
 
-        //Статусы платежей (добавляем только если таблица пуста)
+        // Статусы платежей
         if (!db.StatusPayments.Any())
         {
             db.StatusPayments.AddRange(
@@ -69,29 +59,27 @@ public static class SeedData
             db.SaveChanges();
         }
 
-        // Товары (изделия) – каталог продукции
+        // Товары
         var products = new[]
         {
-            new Product { Name = "Кольцо «Гранатовый рассвет»", Price = 18500, Description = "Серебро 925, гранат 0.8 карат", Article = "GR-101", ImageUrl = "/images/кольцо.png" },
-            new Product { Name = "Серьги «Лунный свет»", Price = 12400, Description = "Серебро 925, гранат 0.5 карат", Article = "GR-102", ImageUrl = "/images/серьги.png" },
-            new Product { Name = "Подвеска «Капля росы»", Price = 9800, Description = "Серебро 925, гранат 1 карат", Article = "GR-103", ImageUrl = "/images/подвеска.jpg" },
-            new Product { Name = "Браслет «Серебряная нить»", Price = 23500, Description = "Серебро 925", Article = "GR-104", ImageUrl = "/images/браслет.png" },
-            new Product { Name = "Брошь «Гранат»", Price = 15900, Description = "Серебро 925, гранат 2 карат", Article = "GR-105", ImageUrl = "/images/брошь.jpg" }
+            new Product { Name = "Кольцо «Гранатовый рассвет»", Type = "Кольцо", Metal = "Серебро 925", Stone = "Гранат 0.8 карат", Weight = 3.2m, Price = 18500, Description = "Изящное кольцо из серебра 925 пробы с натуральным гранатом. Огранка «маркиз».", Article = "GR-101", ImageUrl = "/images/кольцо.png" },
+            new Product { Name = "Серьги «Лунный свет»", Type = "Серьги", Metal = "Серебро 925", Stone = "Гранат 0.5 карат (каждый)", Weight = 4.5m, Price = 12400, Description = "Элегантные серьги-гвоздики с гранатами в серебряной оправе.", Article = "GR-102", ImageUrl = "/images/серьги.png" },
+            new Product { Name = "Подвеска «Капля росы»", Type = "Подвеска", Metal = "Серебро 925", Stone = "Гранат 1 карат", Weight = 1.8m, Price = 9800, Description = "Нежная подвеска в форме капли с крупным гранатом.", Article = "GR-103", ImageUrl = "/images/подвеска.jpg" },
+            new Product { Name = "Браслет «Серебряная нить»", Type = "Браслет", Metal = "Серебро 925", Stone = "Гранат (вставки)", Weight = 6.2m, Price = 23500, Description = "Плетёный браслет с мелкими гранатами.", Article = "GR-104", ImageUrl = "/images/браслет.png" },
+            new Product { Name = "Брошь «Гранат»", Type = "Брошь", Metal = "Серебро 925", Stone = "Гранат 2 карат", Weight = 5.1m, Price = 15900, Description = "Брошь в виде цветка граната.", Article = "GR-105", ImageUrl = "/images/брошь.jpg" }
         };
         db.Products.AddRange(products);
         db.SaveChanges();
 
-        //Тестовые заказы (3 штуки), чтобы сразу увидеть данные в интерфейсе
+        // Тестовые заказы (3 штуки)
         if (!db.Orders.Any())
         {
-            // Находим нужных пользователей и статус
             var client = db.Users.First(u => u.Login == "client");
             var manager = db.Users.First(u => u.Login == "manager");
             var jeweler = db.Users.First(u => u.Login == "jeweler");
-            var statusNew = db.StatusOrders.First(s => s.Name == "new");
-            var product = db.Products.First(); // берём первый товар для суммы
+            var statusNew = db.StatusOrders.First(s => s.Name == "Новый");
+            var product = db.Products.First();
 
-            // Создаём 3 одинаковых заказа (для демонстрации)
             for (int i = 0; i < 3; i++)
             {
                 db.Orders.Add(new Order
@@ -100,7 +88,7 @@ public static class SeedData
                     ManagerId = manager.UserId,
                     JewelerId = jeweler.UserId,
                     StatusOrderId = statusNew.StatusOrderId,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.Now.AddDays(-i),
                     TotalCost = product.Price,
                     Deadline = null
                 });

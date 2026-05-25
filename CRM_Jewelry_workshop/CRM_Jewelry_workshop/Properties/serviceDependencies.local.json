@@ -1,7 +1,15 @@
 {
   "dependencies": {
-    "secrets1": {
-      "type": "secrets.user"
+    "mssql1": {
+      "ignored": "true",
+      "type": "mssql",
+      "connectionId": "ConnectionStrings:CRM_Jewelry_workshop"
+    },
+    "sqlite1": {
+      "secretStore": "LocalSecretsFile",
+      "resourceId": null,
+      "type": "sqlite.local",
+      "connectionId": "CRM_Jewelry_workshop"
     }
   }
 }
