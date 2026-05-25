@@ -1,4 +1,4 @@
-﻿// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ 
+﻿// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 let currentUser = null;
 let cart = [];
 let products = [];
@@ -37,7 +37,69 @@ window.showInputDialog = function (placeholder, title = 'Ювелирная ма
         inputModal.show();
     });
 };
+// УНИВЕРСАЛЬНОЕ МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ
+function showConfirmModal(message) {
+    return new Promise((resolve) => {
+        const modalHtml = `
+        <div class="modal fade" id="confirmModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Подтверждение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <p>${message}</p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="confirmNoBtn">Нет</button>
+                <button type="button" class="btn btn-danger" id="confirmYesBtn">Да</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+        window.deleteUser = async function (id) {
+            if (id === currentUser.id) return window.showToast('Нельзя удалить себя', true);
+            const confirmed = await showConfirmModal('Вы уверены, что хотите удалить этого пользователя?');
+            if (!confirmed) return;
+            try {
+                await apiFetch(`/api/users/${id}`, { method: 'DELETE' });
+                window.showToast('Пользователь удалён');
+                renderAdminDashboard();
+            } catch (e) { window.showToast('Ошибка удаления: ' + e.message, true); }
+        };
 
+        window.deleteMaterial = async function (id) {
+            const confirmed = await showConfirmModal('Вы уверены, что хотите удалить этот материал?');
+            if (!confirmed) return;
+            try {
+                await apiFetch(`/api/materials/${id}`, { method: 'DELETE' });
+                window.showToast('Материал удалён');
+                renderAdminDashboard();
+            } catch (e) { window.showToast('Ошибка: ' + e.message, true); }
+        };
+        const old = document.getElementById('confirmModal');
+        if (old) old.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        const modalEl = document.getElementById('confirmModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        const cleanup = (result) => {
+            modal.hide();
+            modalEl.addEventListener('hidden.bs.modal', () => modalEl.remove());
+            resolve(result);
+        };
+
+        document.getElementById('confirmYesBtn').onclick = () => cleanup(true);
+        document.getElementById('confirmNoBtn').onclick = () => cleanup(false);
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            resolve(false);
+            modalEl.remove();
+        });
+    });
+}
 // УТИЛИТЫ
 window.showToast = function (msg, isError = false) {
     toastMsg.textContent = msg;
@@ -50,7 +112,7 @@ function saveCart() { localStorage.setItem('granat_cart', JSON.stringify(cart));
 function loadCart() { const saved = localStorage.getItem('granat_cart'); if (saved) cart = JSON.parse(saved); updateCartBadge(); }
 function updateCartBadge() { const count = cart.reduce((s, i) => s + (i.quantity || 1), 0); cartCountSpan.innerText = count; }
 
-// API 
+//API 
 async function apiFetch(url, options = {}, silent = false) {
     const headers = {};
     if (currentUser?.token) headers['Authorization'] = `Bearer ${currentUser.token}`;
@@ -58,7 +120,7 @@ async function apiFetch(url, options = {}, silent = false) {
         headers['Content-Type'] = 'application/json';
     }
 
-    console.log(` ${options.method || 'GET'} ${url}`, options.body ? JSON.parse(options.body) : '');
+    console.log(`➡️ ${options.method || 'GET'} ${url}`, options.body ? JSON.parse(options.body) : '');
 
     const res = await fetch(url, { ...options, headers });
 
@@ -68,7 +130,7 @@ async function apiFetch(url, options = {}, silent = false) {
             window.showToast('Сессия истекла', true);
         }
         const err = await res.text();
-        console.error(` 401 от ${url}:`, err);
+        console.error(`401 от ${url}:`, err);
         throw new Error(err || 'Unauthorized');
     }
     if (!res.ok) {
@@ -81,13 +143,13 @@ async function apiFetch(url, options = {}, silent = false) {
     return data;
 }
 
-// ЗАГРУЗКА ДАННЫХ 
+//ЗАГРУЗКА ДАННЫХ
 async function loadProductsFromAPI() {
     try {
         const data = await apiFetch('/api/products', {}, true);
         products = data.map(p => ({ ...p, id: p.productId }));
     } catch (e) {
-        console.warn('Если не удалось загрузить данные с API , то испольем заглушку', e);
+        console.warn('Не удалось загрузить товары, использую заглушку', e);
         products = [
             { productId: 1, name: "Кольцо «Гранатовый рассвет»", price: 18500, description: "Серебро 925, гранат 0.8 карат", metal: "Серебро 925", weight: "3.2", article: "GR-101", imageUrl: "/images/кольцо.png" },
             { productId: 2, name: "Серьги «Лунный свет»", price: 12400, description: "Серебро 925, гранат", metal: "Серебро 925", weight: "4.5", article: "GR-102", imageUrl: "/images/серьги.png" },
@@ -106,7 +168,7 @@ async function loadRepairsFromAPI() {
     ];
 }
 
-// ТЁМНАЯ ТЕМА 
+//ТЁМНАЯ ТЕМА
 const themeToggle = document.getElementById('themeToggle');
 if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-theme');
 if (themeToggle) {
@@ -118,7 +180,7 @@ if (themeToggle) {
     });
 }
 
-// АВАТАР И ВЫХОД 
+// АВАТАР И ВЫХОД
 function updateProfileAvatar() {
     if (!currentUser) {
         profileAvatar.innerHTML = `<i class="fas fa-user-circle"></i>`;
@@ -156,7 +218,7 @@ function logout() {
     window.showToast('Вы вышли');
 }
 
-// АВТОРИЗАЦИЯ 
+// АВТОРИЗАЦИЯ
 function showAuthModal() {
     const container = document.getElementById('authFormContainer');
     container.innerHTML = `
@@ -221,7 +283,7 @@ function showAuthModal() {
         const email = document.getElementById('regEmail').value.trim();
         const phone = document.getElementById('regPhone').value.trim();
         if (!name || !login || !pwd) return window.showToast('Имя, логин и пароль обязательны', true);
-        console.log(`Регистрация: логин="${login}", пароль="${pwd}", имя="${name}"`);
+        console.log(`📝 Регистрация: логин="${login}", пароль="${pwd}", имя="${name}"`);
         try {
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
@@ -239,7 +301,7 @@ function showAuthModal() {
     });
 }
 
-// ========================= КОРЗИНА =========================
+//КОРЗИНА
 function modifyCart(type, id, delta) {
     if (!currentUser || currentUser.role !== 'client') { window.showToast('Войдите как клиент', true); showAuthModal(); return; }
     const idx = cart.findIndex(i => i.type === type && i.id === id);
@@ -301,7 +363,7 @@ async function checkoutOrder() {
 }
 window.modifyCart = modifyCart;
 
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СТАТУСОВ 
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СТАТУСОВ
 function getStatusClass(statusName) {
     const map = {
         'Новый': 'new',
@@ -314,7 +376,7 @@ function getStatusClass(statusName) {
     return map[statusName] || '';
 }
 
-// ИСТОРИЯ ЗАКАЗОВ (клиент) 
+// ИСТОРИЯ ЗАКАЗОВ (клиент)
 async function showOrderHistory() {
     if (!currentUser || currentUser.role !== 'client') {
         window.showToast('Только для клиентов', true);
@@ -353,7 +415,7 @@ async function showOrderHistory() {
     new bootstrap.Modal(document.getElementById('historyModal')).show();
 }
 
-// ТАБЛИЦА ЗАКАЗОВ ДЛЯ ПАНЕЛЕЙ 
+// ТАБЛИЦА ЗАКАЗОВ ДЛЯ ПАНЕЛЕЙ
 async function renderOrdersTable(orders) {
     if (!orders || !orders.length) return '<div class="text-center">Нет заказов</div>';
     let html = `<div class="table-wrapper"><table class="table"><thead>
@@ -405,7 +467,7 @@ async function renderOrdersTable(orders) {
     return html;
 }
 
-// ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЕЙСТВИЙ ДЛЯ СТАТУСОВ ЗАКАЗА 
+// ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЕЙСТВИЙ
 window.acceptOrder = async function (orderId) {
     try { await apiFetch(`/api/orders/${orderId}/accept`, { method: 'PUT' }); window.showToast('Заказ принят'); renderApp(); }
     catch (e) { window.showToast('Ошибка: ' + e.message, true); }
@@ -443,6 +505,9 @@ window.assignJeweler = async function (orderId) {
     if (!jewelers.length) { window.showToast('Нет доступных ювелиров', true); return; }
 
     const select = document.getElementById('jewelerSelect');
+
+    // Добавлен чёрный цвет текста в выпадающем списке
+    select.setAttribute('style', 'color: #000; background-color: #fff;');
     select.innerHTML = jewelers.map(j => `<option value="${j.userId}">${j.fullName} (ID: ${j.userId})</option>`).join('');
     const modal = new bootstrap.Modal(document.getElementById('jewelerSelectModal'));
     modal.show();
@@ -505,7 +570,7 @@ window.deleteMaterial = async function (id) {
     } catch (e) { window.showToast('Ошибка: ' + e.message, true); }
 };
 
-// АДМИН-ПАНЕЛЬ ПОСЛЕ ВХОДА
+// АДМИН-ПАНЕЛЬ
 async function renderAdminDashboard() {
     let orders = [], users = [], materials = [];
     try { orders = await apiFetch('/api/orders'); } catch (e) { console.warn(e); }
@@ -591,21 +656,93 @@ async function renderUsersTable(users) {
     });
     html += `</tbody></table></div>`;
     document.getElementById('adminContent').innerHTML = html;
-    document.getElementById('addUserBtn')?.addEventListener('click', async () => {
-        const login = await window.showInputDialog('Логин сотрудника', 'Ювелирная мастерская Гранат');
-        if (login) {
-            const pwd = await window.showInputDialog('Пароль', 'Ювелирная мастерская Гранат');
-            const name = await window.showInputDialog('Полное имя', 'Ювелирная мастерская Гранат');
-            const role = await window.showInputDialog('Роль (manager/jeweler)', 'Ювелирная мастерская Гранат');
-            if (login && pwd && name && role && (role === 'manager' || role === 'jeweler')) {
+
+    // Замена пошагового ввода на единую форму
+    const addUserBtn = document.getElementById('addUserBtn');
+    if (addUserBtn) {
+        addUserBtn.addEventListener('click', () => {
+            const modalHtml = `
+            <div class="modal fade" id="addUserModal" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Добавить сотрудника</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <label class="form-label">Логин</label>
+                      <input type="text" class="form-control" id="newUserLogin">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Пароль</label>
+                      <input type="password" class="form-control" id="newUserPassword">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Полное имя</label>
+                      <input type="text" class="form-control" id="newUserFullName">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Роль</label>
+                      <select class="form-select" id="newUserRole" style="color: #000; background-color: #fff;">
+                        <option value="manager">Менеджер</option>
+                        <option value="jeweler">Ювелир</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="saveUserBtn">Добавить</button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+
+            const old = document.getElementById('addUserModal');
+            if (old) old.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            const modalEl = document.getElementById('addUserModal');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            document.getElementById('saveUserBtn').addEventListener('click', async () => {
+                const login = document.getElementById('newUserLogin').value.trim();
+                const pwd = document.getElementById('newUserPassword').value.trim();
+                const name = document.getElementById('newUserFullName').value.trim();
+                const role = document.getElementById('newUserRole').value;
+
+                if (!login || !pwd || !name) {
+                    window.showToast('Все поля, кроме роли, обязательны', true);
+                    return;
+                }
+
                 try {
-                    await apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify({ login, password: pwd, fullName: name, phone: '', email: '' }) });
+                    await apiFetch('/api/auth/register', {
+                        method: 'POST',
+                        body: JSON.stringify({ login, password: pwd, fullName: name, phone: '', email: '' })
+                    });
+
+                    const users = await apiFetch('/api/users');
+                    const newUser = users.find(u => u.login === login);
+                    if (newUser && (role === 'manager' || role === 'jeweler')) {
+                        await apiFetch(`/api/users/${newUser.userId}/role`, {
+                            method: 'PUT',
+                            body: JSON.stringify({ Role: role })   // Role с большой буквы
+                        });
+                    }
+
+                    modal.hide();
                     window.showToast('Сотрудник добавлен');
                     renderAdminDashboard();
-                } catch (e) { window.showToast('Ошибка добавления', true); }
-            } else window.showToast('Некорректная роль', true);
-        }
-    });
+                } catch (e) {
+                    window.showToast('Ошибка: ' + e.message, true);
+                }
+            });
+
+            modalEl.addEventListener('hidden.bs.modal', () => modalEl.remove());
+        });
+    }
 }
 async function renderMaterialsTable(materials) {
     let html = `<h3>Материалы</h3>
@@ -623,7 +760,10 @@ async function renderMaterialsTable(materials) {
     });
     html += `</tbody></table></div>`;
     document.getElementById('adminContent').innerHTML = html;
-    document.getElementById('addMaterialBtn')?.addEventListener('click', showAddMaterialForm);
+    const addMaterialBtn = document.getElementById('addMaterialBtn');
+    if (addMaterialBtn) {
+        addMaterialBtn.addEventListener('click', showAddMaterialForm);
+    }
 }
 function showAddMaterialForm() {
     const modalHtml = `
@@ -662,7 +802,6 @@ function showAddMaterialForm() {
 
     const oldModal = document.getElementById('addMaterialModal');
     if (oldModal) oldModal.remove();
-
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 
     const modalElement = document.getElementById('addMaterialModal');
@@ -705,7 +844,7 @@ function showAddMaterialForm() {
     });
 }
 
-// МЕНЕДЖЕР-ПАНЕЛЬ ПОСЛЕ ВХОДА 
+// МЕНЕДЖЕР-ПАНЕЛЬ
 async function renderManagerDashboard() {
     let orders = [], materials = [];
     try { orders = await apiFetch('/api/orders'); } catch (e) { console.warn(e); }
@@ -732,13 +871,13 @@ async function renderManagerDashboard() {
     document.getElementById('managerContent').innerHTML = await renderOrdersTable(orders);
 }
 
-// ЮВЕЛИР-ПАНЕЛЬ ПОСЛЕ ВХОДА
+// ЮВЕЛИР-ПАНЕЛЬ
 async function renderJewelerDashboard() {
     let orders = [], materials = [];
     try { orders = await apiFetch('/api/orders'); } catch (e) { console.warn(e); }
     try { materials = await apiFetch('/api/materials'); } catch (e) { console.warn(e); }
     let html = `<div class="dashboard">
-        <h2 class="mb-3"> Панель ювелира</h2>
+        <h2 class="mb-3">Панель ювелира</h2>
         <div class="d-flex flex-wrap gap-2 mb-3">
             <button id="jewelerOrdersBtn" class="btn-primary glass-btn">Мои заказы</button>
             <button id="jewelerMaterialsBtn" class="btn-outline glass-btn">Материалы</button>
@@ -770,11 +909,11 @@ function renderClientCatalog() {
     let html = `<h2 class="catalog-title"> Каталог ювелирных украшений</h2>`;
     if (currentUser && currentUser.role === 'client') {
         html += `<div class="action-bar">
-            <button id="repairActionBtn" class="btn-outline glass-btn"> Услуги ремонта</button>
+            <button id="repairActionBtn" class="btn-outline glass-btn">Услуги ремонта</button>
         </div>`;
     } else if (!currentUser) {
         html += `<div class="action-bar">
-            <p class="text-muted">Для покупки войдите как клиент</p>
+          <p class="text-muted">Для покупки войдите как клиент</p>
         </div>`;
     }
     if (isOnMainSite && currentUser && currentUser.role !== 'client') {
@@ -846,7 +985,7 @@ function showProductModal(id) {
     new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
-// ГЛАВНЫЙ РЕНДЕР (ВЫЗЫВАЕТСЯ ПРИ ОБНОВЛЕНИИ)
+//  ГЛАВНЫЙ РЕНДЕР 
 async function renderApp() {
     const saved = sessionStorage.getItem('granat_user');
     if (saved && !currentUser) {
@@ -870,7 +1009,7 @@ async function renderApp() {
     initScrollAnimation();
 }
 
-// АНИМАЦИЯ
+// АНИМАЦИЯ 
 function initScrollAnimation() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('animated'); observer.unobserve(e.target); } });
@@ -887,4 +1026,4 @@ function initScrollAnimation() {
     await renderApp();
     cartBtn.addEventListener('click', () => { renderCartModal(); new bootstrap.Modal(document.getElementById('cartModal')).show(); });
     if (historyBtn) historyBtn.addEventListener('click', showOrderHistory);
-})();
+})(); 

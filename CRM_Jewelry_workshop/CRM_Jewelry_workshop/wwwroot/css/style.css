@@ -1,27 +1,28 @@
-﻿:root {
+﻿/*Основная палитра цветов на светлую тему*/
+:root {
     --bg-body: #fefcf8;
     --bg-surface: #ffffff;
     --text-primary: #2c2c2c;
     --text-secondary: #6a6a6a;
-    --accent: #be1f1f;
-    --accent-dark: #8b1515;
+    --accent: #850f0fd9;
+    --accent-dark: #850f0fd9;
     --border: #eae2d7;
-    --header-bg: rgba(255,255,255,0.92);
+    --header-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.5);
     --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
     --hero-font-size: 4rem;
     --hero-btn-padding: 12px 36px;
 }
-
+/*Основная палитра цветов на темную тему*/
 body.dark-theme {
     --bg-body: #121212;
     --bg-surface: #1e1e1e;
     --text-primary: #ffffff;
     --text-secondary: #bbbbbb;
-    --accent: #bd3a3a;
-    --accent-dark: #8f2a2a;
-    --border: #4a3a3a;
-    --header-bg: rgba(18,18,18,0.94);
+    --accent: #850f0fd9;
+    --accent-dark: #850f0fd9;
+    --border: rgb(125, 27, 27);
+    --header-bg: rgba(18, 18, 18, 0.2);
     --glass-border: rgba(255, 255, 255, 0.15);
 }
 
@@ -39,7 +40,7 @@ body {
     position: relative;
 }
 
-/* ========== ВЕРХНЯЯ ПАНЕЛЬ ========== */
+/* ВЕРХНЯЯ ПАНЕЛЬ*/
 header {
     width: 100%;
     background: var(--header-bg);
@@ -63,12 +64,12 @@ header {
     }
 }
 
-/* ========== ГЕРОЙ-БЛОК ========== */
+/*  ГЕРОЙ-БЛОК (с фоновой картинкой гранат) */
 .hero-fullscreen {
     position: relative;
     width: 100%;
-    min-height: 90vh;
-    background-image: url('../images/гранат.png');
+    min-height: 100vh;
+    background-image: url('../images/гранат2.png');
     background-size: cover;
     background-position: center;
     display: flex;
@@ -168,7 +169,7 @@ body.dark-theme .glass-btn {
         color: white;
     }
 
-/* ========== КАРТОЧКИ ТОВАРОВ ========== */
+/* КАРТОЧКИ ТОВАРОВ */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -216,7 +217,7 @@ body.dark-theme .product-img {
     margin: 8px 0;
 }
 
-/* ========== ТАБЛИЦЫ, ДАШБОРДЫ ========== */
+/* ТАБЛИЦЫ, ДАШБОРДЫ  */
 body.dark-theme .product-card,
 body.dark-theme .dashboard,
 body.dark-theme .table-wrapper,
@@ -321,12 +322,18 @@ body.dark-theme .status-cancelled {
     justify-content: flex-start;
 }
 
+body.dark-theme .text-muted {
+    color: #cccccc !important;
+}
+
 .catalog-title {
     font-size: 2rem;
     font-weight: 700;
     color: var(--accent);
     margin: 2rem 0 1rem 0;
 }
+
+
 
 @media (max-width: 768px) {
     .catalog-title {
@@ -491,7 +498,7 @@ body.dark-theme .form-select {
         color: white;
     }
 
-/* Футер */
+/* Футер нижняя часть страницы */
 .footer-brand {
     color: var(--accent);
     font-weight: 500;
@@ -504,7 +511,7 @@ body.dark-theme .form-select {
     margin-top: 0.25rem;
 }
 
-/* Тост */
+/* Тост уведомление внизу после отределённого действия */
 .toast-msg {
     position: fixed;
     bottom: 30px;
@@ -555,3 +562,57 @@ body.dark-theme .status-ready {
     background: #004d40;
     color: #b2dfdb;
 }
+/*Текст подсказка на темной теме*/
+body.dark-theme ::placeholder {
+    color: #aaa !important;
+    opacity: 1;
+}
+header .container {
+    max-width: 100% !important;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+/*Вверху*/
+/* Для светлой темы — более темнее Ювелирная мастерская */
+header .text-secondary {
+    color: #2a2a37 !important;
+}
+
+/* Для тёмной темы — ещё светлее, чтобы выделялся Ювелирная мастерская */
+body.dark-theme header .text-secondary {
+    color: #bbb !important;
+} 
+/*Внизу*/
+/* "Гранат" и год — всегда красные (вне зависимости от темы) */
+.footer-granat,
+.footer-year {
+    color: #be1f1f !important; 
+}
+
+/* Разделитель "|" — наследует цвет текста, который меняется с темой */
+.footer-separator {
+    color: var(--text-primary);
+}
+
+/* "Ювелирная мастерская" — автоматически подстраивается под тему */
+.footer-subtitle {
+    color: var(--text-primary);
+}
+ 
+/*При наведении на карточки появляется свечение */
+    body.dark-theme .product-card:hover {
+        box-shadow: 0 0 20px rgba(190, 31, 31, 0.7);
+    }
+
+    body.dark-theme .product-card:active {
+        box-shadow: 0 0 20px rgba(190, 31, 31, 0.7);
+        transform: scale(0.98);
+        transition: box-shadow 0.1s ease, transform 0.1s ease;
+    }
+
+/*Текст на карточках для услуги ремонта*/
+body.dark-theme .list-group-item.glass-card {
+    color: #ffffff !important;
+}
+
+ 
